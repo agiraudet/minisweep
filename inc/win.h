@@ -16,8 +16,8 @@ struct win {
 
 void number_draw(int8_t n, size_t x, size_t y, size_t size);
 void win_init(struct win *win, struct grid *grid, size_t width, size_t height);
-void win_drawgcell(struct win *win, struct grid *grid, size_t pos,
-                   int8_t reveal);
+void win_drawcell(struct win *win, struct grid *grid, size_t pos,
+                  int8_t reveal);
 void win_drawgrid(struct win *win, struct grid *grid);
 void win_onlclic(struct win *win, struct grid *grid, int x, int y);
 void win_onrclic(struct win *win, struct grid *grid, int x, int y);

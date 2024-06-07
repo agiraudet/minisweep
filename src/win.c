@@ -21,8 +21,8 @@ void win_init(struct win *win, struct grid *grid, size_t width, size_t height) {
   win->draw_size = win->cell_size - (win->margin * 2);
 }
 
-void win_drawgcell(struct win *win, struct grid *grid, size_t pos,
-                   int8_t reveal) {
+void win_drawcell(struct win *win, struct grid *grid, size_t pos,
+                  int8_t reveal) {
   size_t pos_x = pos % grid->width * win->cell_size + win->margin;
   size_t pos_y = pos / grid->width * win->cell_size + win->margin;
 
@@ -45,13 +45,13 @@ void win_drawgrid(struct win *win, struct grid *grid) {
   if (!win || !grid)
     return;
   for (size_t i = 0; i < grid->ncells; i++)
-    win_drawgcell(win, grid, i, 0);
+    win_drawcell(win, grid, i, 0);
 }
 
 void win_showbombs(struct win *win, struct grid *grid) {
   for (size_t i = 0; i < grid->ncells; i++) {
     if (grid->cells[i].data == -1)
-      win_drawgcell(win, grid, i, 1);
+      win_drawcell(win, grid, i, 1);
   }
 }
 
@@ -61,7 +61,7 @@ void win_propagatecell(void *windata, struct grid *grid, size_t pos) {
   if (cell->revelead)
     return;
   if (cell->data >= 0) {
-    win_drawgcell(win, grid, pos, 1);
+    win_drawcell(win, grid, pos, 1);
     cell->revelead = 1;
   }
   if (cell->data == 0) {
@@ -77,7 +77,7 @@ size_t win_posfromxy(struct win *win, struct grid *grid, int x, int y) {
 
 void win_onrclic(struct win *win, struct grid *grid, int x, int y) {
   size_t pos = win_posfromxy(win, grid, x, y);
-  win_drawgcell(win, grid, pos, -1);
+  win_drawcell(win, grid, pos, -1);
 }
 
 void win_onlclic(struct win *win, struct grid *grid, int x, int y) {

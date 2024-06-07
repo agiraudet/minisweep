@@ -7,6 +7,7 @@
 #define SCREEN_HEIGHT 400
 
 int main(void) {
+  SetTraceLogLevel(LOG_NONE);
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "minisweep");
   SetTargetFPS(60);
 

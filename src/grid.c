@@ -41,6 +41,7 @@ struct grid *grid_create(size_t width, size_t height, size_t nbombs) {
   grid->width = width;
   grid->height = height;
   grid->ncells = width * height;
+  grid->nrevelead = 0;
   grid->cells = calloc(width * height, sizeof(struct cell));
   if (!grid->cells) {
     free(grid);

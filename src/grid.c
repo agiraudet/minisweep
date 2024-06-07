@@ -3,6 +3,32 @@
 #include <stdlib.h>
 #include <time.h>
 
+void grid_foreacharound(void *data, struct grid *grid, size_t pos,
+                        void f(void *, struct grid *, size_t)) {
+  if (!grid)
+    return;
+  if (pos % grid->width) {
+    if (pos - 1 >= grid->width) // top-left
+      f(data, grid, pos - 1 - grid->width);
+    if (pos > 0) // left
+      f(data, grid, pos - 1);
+    if (pos - 1 + grid->width < grid->ncells) // bottom-left
+      f(data, grid, pos - 1 + grid->width);
+  }
+  if ((pos + 1) % grid->width) {
+    if (pos + 1 >= grid->width) // top-right
+      f(data, grid, pos + 1 - grid->width);
+    if (pos + 1 < grid->ncells) // right
+      f(data, grid, pos + 1);
+    if (pos + 1 + grid->width < grid->ncells) // bottom-rigth
+      f(data, grid, pos + 1 + grid->width);
+  }
+  if (pos >= grid->width) // top
+    f(data, grid, pos - grid->width);
+  if (pos + grid->width < grid->ncells) // bottom
+    f(data, grid, pos + grid->width);
+}
+
 struct grid *grid_create(size_t width, size_t height, size_t nbombs) {
   struct grid *grid;
 
@@ -29,30 +55,12 @@ void grid_destroy(struct grid *grid) {
   free(grid);
 }
 
-void grid_incdata(struct grid *grid, size_t pos) {
+void grid_incdata(void *data, struct grid *grid, size_t pos) {
+  (void)data;
   if (!grid)
     return;
   if (pos < grid->ncells && grid->cells[pos].data != -1)
     grid->cells[pos].data += 1;
-}
-
-void grid_around_incdata(struct grid *grid, size_t pos) {
-  if (!grid)
-    return;
-  if (pos % grid->width) {
-    grid_incdata(grid, pos - grid->width - 1);
-    grid_incdata(grid, pos + grid->width - 1);
-    grid_incdata(grid, pos - 1);
-  }
-  if (pos > grid->width)
-    grid_incdata(grid, pos - grid->width);
-  if (pos < grid->ncells - grid->width)
-    grid_incdata(grid, pos + grid->width);
-  if ((pos + 1) % grid->width) {
-    grid_incdata(grid, pos - grid->width + 1);
-    grid_incdata(grid, pos + 1);
-    grid_incdata(grid, pos + grid->width + 1);
-  }
 }
 
 void grid_putbombs(struct grid *grid) {
@@ -68,7 +76,8 @@ void grid_putbombs(struct grid *grid) {
       pos = rand() % grid->ncells;
     } while (grid->cells[pos].data == -1);
     grid->cells[pos].data = -1;
-    grid_around_incdata(grid, pos);
+    // grid_around_incdata(grid, pos);
+    grid_foreacharound(0, grid, pos, &grid_incdata);
     nbombs--;
   }
 }

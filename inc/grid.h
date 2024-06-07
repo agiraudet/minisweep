@@ -18,6 +18,8 @@ struct grid {
   struct cell *cells;
 };
 
+void grid_foreacharound(void *data, struct grid *grid, size_t pos,
+                        void f(void *, struct grid *, size_t));
 struct grid *grid_create(size_t width, size_t height, size_t nbombs);
 void grid_destroy(struct grid *grid);
 void grid_putbombs(struct grid *grid);

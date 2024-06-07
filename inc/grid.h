@@ -14,7 +14,7 @@ struct grid {
   size_t ncells;
   size_t width;
   size_t height;
-  /*int8_t *cells;*/
+  size_t nrevelead;
   struct cell *cells;
 };
 

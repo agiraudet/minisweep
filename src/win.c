@@ -2,13 +2,34 @@
 #include "grid.h"
 #include "raylib.h"
 #include <stdint.h>
+#include <stdio.h>
 
 static size_t min(size_t a, size_t b) { return a <= b ? a : b; }
 
 void number_draw(int8_t n, size_t x, size_t y, size_t size) {
   if (n > 9 || n < 0)
     n = 8;
-  DrawText(TextFormat("%i", n), x, y, size, WHITE);
+  Color color;
+  switch (n) {
+  case 1:
+    color = DARKBLUE;
+    break;
+  case 2:
+    color = DARKGREEN;
+    break;
+  case 3:
+    color = RED;
+    break;
+  case 4:
+    color = PURPLE;
+    break;
+  case 5:
+    color = ORANGE;
+    break;
+  default:
+    color = WHITE;
+  }
+  DrawText(TextFormat("%i", n), x, y, size, color);
 }
 
 void win_init(struct win *win, struct grid *grid, size_t width, size_t height) {
@@ -63,6 +84,7 @@ void win_propagatecell(void *windata, struct grid *grid, size_t pos) {
   if (cell->data >= 0) {
     win_drawcell(win, grid, pos, 1);
     cell->revelead = 1;
+    grid->nrevelead++;
   }
   if (cell->data == 0) {
     grid_foreacharound(win, grid, pos, &win_propagatecell);
@@ -84,7 +106,11 @@ void win_onlclic(struct win *win, struct grid *grid, int x, int y) {
   size_t pos = win_posfromxy(win, grid, x, y);
   if (grid->cells[pos].data == -1) {
     win_showbombs(win, grid);
+    printf("Oh no...\n");
     return;
   }
   win_propagatecell(win, grid, pos);
+  if (grid->nrevelead == grid->ncells - grid->nbombs) {
+    printf("Congrats !!!! You win.\n");
+  }
 }

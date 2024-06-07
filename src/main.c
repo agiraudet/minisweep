@@ -7,13 +7,15 @@
 #define SCREEN_HEIGHT 400
 
 int main(void) {
+  struct win win;
+  struct grid *grid = grid_create(20, 20, 40);
+  if (!grid)
+    return 1;
+  win_init(&win, grid, SCREEN_WIDTH, SCREEN_HEIGHT);
+
   SetTraceLogLevel(LOG_NONE);
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "minisweep");
-  SetTargetFPS(60);
-
-  struct grid *grid = grid_create(20, 20, 40);
-  struct win win;
-  win_init(&win, grid, SCREEN_WIDTH, SCREEN_HEIGHT);
+  SetTargetFPS(30);
   BeginDrawing();
   ClearBackground(BLACK);
   win_drawgrid(&win, grid);

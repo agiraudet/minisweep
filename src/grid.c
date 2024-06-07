@@ -8,24 +8,32 @@ void grid_foreacharound(void *data, struct grid *grid, size_t pos,
   if (!grid)
     return;
   if (pos % grid->width) {
-    if (pos - 1 >= grid->width) // top-left
+    // top-left
+    if (pos - 1 >= grid->width)
       f(data, grid, pos - 1 - grid->width);
-    if (pos > 0) // left
+    // left
+    if (pos > 0)
       f(data, grid, pos - 1);
-    if (pos - 1 + grid->width < grid->ncells) // bottom-left
+    // bottom-left
+    if (pos - 1 + grid->width < grid->ncells)
       f(data, grid, pos - 1 + grid->width);
   }
   if ((pos + 1) % grid->width) {
-    if (pos + 1 >= grid->width) // top-right
+    // top-right
+    if (pos + 1 >= grid->width)
       f(data, grid, pos + 1 - grid->width);
-    if (pos + 1 < grid->ncells) // right
+    // right
+    if (pos + 1 < grid->ncells)
       f(data, grid, pos + 1);
-    if (pos + 1 + grid->width < grid->ncells) // bottom-rigth
+    // bottom-right
+    if (pos + 1 + grid->width < grid->ncells)
       f(data, grid, pos + 1 + grid->width);
   }
-  if (pos >= grid->width) // top
+  // top
+  if (pos >= grid->width)
     f(data, grid, pos - grid->width);
-  if (pos + grid->width < grid->ncells) // bottom
+  // bottom
+  if (pos + grid->width < grid->ncells)
     f(data, grid, pos + grid->width);
 }
 
@@ -77,7 +85,6 @@ void grid_putbombs(struct grid *grid) {
       pos = rand() % grid->ncells;
     } while (grid->cells[pos].data == -1);
     grid->cells[pos].data = -1;
-    // grid_around_incdata(grid, pos);
     grid_foreacharound(0, grid, pos, &grid_incdata);
     nbombs--;
   }

@@ -2,14 +2,13 @@
 #include "grid.h"
 #include "raylib.h"
 #include <stdint.h>
-#include <stdio.h>
 
 static size_t min(size_t a, size_t b) { return a <= b ? a : b; }
 
 void number_draw(int8_t n, size_t x, size_t y, size_t size) {
   if (n > 9 || n < 0)
     n = 8;
-  DrawText(TextFormat("%i", n), x, y, size, BLUE);
+  DrawText(TextFormat("%i", n), x, y, size, WHITE);
 }
 
 void win_init(struct win *win, struct grid *grid, size_t width, size_t height) {
@@ -28,13 +27,13 @@ void win_drawgcell(struct win *win, struct grid *grid, size_t pos,
   size_t pos_y = pos / grid->width * win->cell_size + win->margin;
 
   if (reveal == 0) {
-    DrawRectangle(pos_x, pos_y, win->draw_size, win->draw_size, LIGHTGRAY);
+    DrawRectangle(pos_x, pos_y, win->draw_size, win->draw_size, DARKGRAY);
   } else if (reveal == -1) {
     DrawRectangle(pos_x, pos_y, win->draw_size, win->draw_size, YELLOW);
   } else {
     int8_t cell_data = grid->cells[pos].data;
     DrawRectangle(pos_x, pos_y, win->draw_size, win->draw_size,
-                  cell_data == -1 ? RED : WHITE);
+                  cell_data == -1 ? RED : GRAY);
     if (cell_data > 0) {
       number_draw(cell_data, pos_x + win->draw_size / 2 - 2, pos_y,
                   win->draw_size);
@@ -56,9 +55,9 @@ void win_showbombs(struct win *win, struct grid *grid) {
   }
 }
 
-void win_propagatecell(struct win *win, struct grid *grid, size_t pos) {
+void win_propagatecell(void *windata, struct grid *grid, size_t pos) {
+  struct win *win = windata;
   struct cell *cell = &grid->cells[pos];
-  printf("pos:%ld, d:%d r:%d\n", pos, cell->data, cell->revelead);
   if (cell->revelead)
     return;
   if (cell->data >= 0) {
@@ -66,14 +65,7 @@ void win_propagatecell(struct win *win, struct grid *grid, size_t pos) {
     cell->revelead = 1;
   }
   if (cell->data == 0) {
-    if (pos >= 1 && pos % grid->width)
-      win_propagatecell(win, grid, pos - 1);
-    if (pos + 1 < grid->ncells && (pos + 1) % grid->width)
-      win_propagatecell(win, grid, pos + 1);
-    if (pos >= grid->width)
-      win_propagatecell(win, grid, pos - grid->width);
-    if (pos + grid->width < grid->ncells)
-      win_propagatecell(win, grid, pos + grid->width);
+    grid_foreacharound(win, grid, pos, &win_propagatecell);
   }
 }
 

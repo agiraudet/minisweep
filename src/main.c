@@ -14,7 +14,7 @@ int main(void) {
   struct win win;
   win_init(&win, grid, SCREEN_WIDTH, SCREEN_HEIGHT);
   BeginDrawing();
-  ClearBackground(RAYWHITE);
+  ClearBackground(BLACK);
   win_drawgrid(&win, grid);
   EndDrawing();
 
@@ -30,6 +30,6 @@ int main(void) {
   }
 
   CloseWindow();
-
+  grid_destroy(grid);
   return 0;
 }

@@ -2,13 +2,10 @@
 #include "grid.h"
 #include "raylib.h"
 #include <stdint.h>
-#include <stdio.h>
 
 static size_t min(size_t a, size_t b) { return a <= b ? a : b; }
 
 void number_draw(int8_t n, size_t x, size_t y, size_t size) {
-  if (n > 9 || n < 0)
-    n = 8;
   Color color;
   switch (n) {
   case 1:
@@ -42,23 +39,26 @@ void win_init(struct win *win, struct grid *grid, size_t width, size_t height) {
   win->draw_size = win->cell_size - (win->margin * 2);
 }
 
-void win_drawcell(struct win *win, struct grid *grid, size_t pos,
-                  int8_t reveal) {
+Color win_getcellcolor(struct cell *cell) {
+  if (cell->status == HIDDEN)
+    return DARKGRAY;
+  if (cell->status == FLAGGED)
+    return YELLOW;
+  if (cell->data == -1)
+    return RED;
+  return GRAY;
+}
+
+void win_drawcell(struct win *win, struct grid *grid, size_t pos) {
+  struct cell *cell = &grid->cells[pos];
+  Color color = win_getcellcolor(cell);
   size_t pos_x = pos % grid->width * win->cell_size + win->margin;
   size_t pos_y = pos / grid->width * win->cell_size + win->margin;
 
-  if (reveal == 0) {
-    DrawRectangle(pos_x, pos_y, win->draw_size, win->draw_size, DARKGRAY);
-  } else if (reveal == -1) {
-    DrawRectangle(pos_x, pos_y, win->draw_size, win->draw_size, YELLOW);
-  } else {
-    int8_t cell_data = grid->cells[pos].data;
-    DrawRectangle(pos_x, pos_y, win->draw_size, win->draw_size,
-                  cell_data == -1 ? RED : GRAY);
-    if (cell_data > 0) {
-      number_draw(cell_data, pos_x + win->draw_size / 2 - 2, pos_y,
-                  win->draw_size);
-    }
+  DrawRectangle(pos_x, pos_y, win->draw_size, win->draw_size, color);
+  if (cell->status == REVEALED && cell->data > 0) {
+    number_draw(cell->data, pos_x + win->draw_size / 2 - 2, pos_y,
+                win->draw_size);
   }
 }
 
@@ -66,29 +66,7 @@ void win_drawgrid(struct win *win, struct grid *grid) {
   if (!win || !grid)
     return;
   for (size_t i = 0; i < grid->ncells; i++)
-    win_drawcell(win, grid, i, 0);
-}
-
-void win_showbombs(struct win *win, struct grid *grid) {
-  for (size_t i = 0; i < grid->ncells; i++) {
-    if (grid->cells[i].data == -1)
-      win_drawcell(win, grid, i, 1);
-  }
-}
-
-void win_propagatecell(void *windata, struct grid *grid, size_t pos) {
-  struct win *win = windata;
-  struct cell *cell = &grid->cells[pos];
-  if (cell->revelead)
-    return;
-  if (cell->data >= 0) {
-    win_drawcell(win, grid, pos, 1);
-    cell->revelead = 1;
-    grid->nrevelead++;
-  }
-  if (cell->data == 0) {
-    grid_foreacharound(win, grid, pos, &win_propagatecell);
-  }
+    win_drawcell(win, grid, i);
 }
 
 size_t win_posfromxy(struct win *win, struct grid *grid, int x, int y) {
@@ -99,18 +77,16 @@ size_t win_posfromxy(struct win *win, struct grid *grid, int x, int y) {
 
 void win_onrclic(struct win *win, struct grid *grid, int x, int y) {
   size_t pos = win_posfromxy(win, grid, x, y);
-  win_drawcell(win, grid, pos, -1);
+
+  if (grid->cells[pos].status == REVEALED)
+    return;
+  grid->cells[pos].status ^= FLAGGED;
 }
 
 void win_onlclic(struct win *win, struct grid *grid, int x, int y) {
   size_t pos = win_posfromxy(win, grid, x, y);
-  if (grid->cells[pos].data == -1) {
-    win_showbombs(win, grid);
-    printf("Oh no...\n");
-    return;
-  }
-  win_propagatecell(win, grid, pos);
-  if (grid->nrevelead == grid->ncells - grid->nbombs) {
-    printf("Congrats !!!! You win.\n");
-  }
+  if (grid->cells[pos].status == REVEALED)
+    grid_revealaroundcell(grid, pos);
+  else
+    grid_propagatecell(grid, pos, 0);
 }

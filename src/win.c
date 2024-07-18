@@ -1,36 +1,37 @@
 #include "win.h"
 #include "grid.h"
 #include "raylib.h"
+#include "theme.h"
 #include <stdint.h>
 #include <stdio.h>
-#include <string.h>
 
 #define DEBUG_BOMB 0
 
 static size_t min(size_t a, size_t b) { return a <= b ? a : b; }
 
 void number_draw(int8_t n, size_t x, size_t y, size_t size) {
-  Color color;
-  switch (n) {
-  case 1:
-    color = DARKBLUE;
-    break;
-  case 2:
-    color = DARKGREEN;
-    break;
-  case 3:
-    color = RED;
-    break;
-  case 4:
-    color = PURPLE;
-    break;
-  case 5:
-    color = ORANGE;
-    break;
-  default:
-    color = WHITE;
-  }
-  DrawText(TextFormat("%i", n), x, y, size, color);
+  // Color color;
+  // switch (n) {
+  // case 1:
+  //   color = DARKBLUE;
+  //   break;
+  // case 2:
+  //   color = DARKGREEN;
+  //   break;
+  // case 3:
+  //   color = RED;
+  //   break;
+  // case 4:
+  //   color = PURPLE;
+  //   break;
+  // case 5:
+  //   color = ORANGE;
+  //   break;
+  // default:
+  //   color = WHITE;
+  // }
+  n = n <= 5 ? n : 0;
+  DrawText(TextFormat("%i", n), x, y, size, g_theme.numbers[n]);
 }
 
 void win_adujstoffset(struct win *win, struct grid *grid) {
@@ -58,12 +59,12 @@ Color win_getcellcolor(struct cell *cell) {
   if (cell->data == -1 && DEBUG_BOMB)
     return SKYBLUE;
   if (cell->status == HIDDEN)
-    return DARKGRAY;
+    return g_theme.hidden;
   if (cell->status == FLAGGED)
-    return YELLOW;
+    return g_theme.flagged;
   if (cell->data == -1)
-    return RED;
-  return GRAY;
+    return g_theme.bomb;
+  return g_theme.cell;
 }
 
 void win_drawcell(struct win *win, struct grid *grid, size_t pos) {
@@ -149,5 +150,5 @@ void win_printtimer(struct win *win, double time) {
   size_t time_size = win->offy - 4;
   int time_x = win->absw / 2 - MeasureText(buf, time_size) / 2;
   int time_y = win->offy / 2 - time_size / 2;
-  DrawText(TextFormat("%s", buf), time_x, time_y, time_size, WHITE);
+  DrawText(TextFormat("%s", buf), time_x, time_y, time_size, g_theme.timer);
 }

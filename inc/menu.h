@@ -10,6 +10,7 @@ typedef struct button {
   float round;
   float border_w;
   Color border_color;
+  Color label_color;
   char *label;
 } button;
 
@@ -29,5 +30,7 @@ void menu_update_size(menu *mn, size_t w, size_t h);
 menu *menu_create_main(size_t winw, size_t winh);
 void menu_draw(menu *mn);
 const char *menu_find_clic(menu *mn, int x, int y);
+void menu_destroy(menu *mn);
+void menu_update_colors(menu *mn);
 
 #endif

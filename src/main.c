@@ -1,6 +1,7 @@
 #include "grid.h"
 #include "menu.h"
 #include "raylib.h"
+#include "theme.h"
 #include "win.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -22,7 +23,7 @@ void msg_end(struct grid *grid) {
   }
 }
 
-void game_loop(struct win *win, struct grid *grid) {
+void game_loop(struct win *win, struct grid *grid, int *menu_mode) {
   if (IsWindowResized()) {
     win_init(win, grid, GetScreenWidth() - SCREEN_MARGIN,
              GetScreenHeight() - SCREEN_MARGIN, SCREEN_MARGIN, SCREEN_MARGIN);
@@ -33,6 +34,9 @@ void game_loop(struct win *win, struct grid *grid) {
       if (grid_checkwin(grid) != 0) {
         grid->time_end = GetTime();
         msg_end(grid);
+        (void)menu_mode;
+        // *menu_mode = 1;
+        // grid_destroy(grid);
       }
     }
     if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
@@ -40,7 +44,7 @@ void game_loop(struct win *win, struct grid *grid) {
     }
   }
   BeginDrawing();
-  ClearBackground(BLACK);
+  ClearBackground(g_theme.bg);
   win_drawgrid(win, grid);
   if (grid->game_status == 0)
     win_printtimer(win, GetTime() - grid->time_start);
@@ -66,6 +70,9 @@ void menu_loop(menu *mn, struct win *win, struct grid **grid, int *menu_mode) {
       } else if (strcmp(str, "large") == 0) {
         *grid = grid_create(30, 30, 90);
         *menu_mode = 0;
+      } else if (strcmp(str, "change theme") == 0) {
+        next_theme();
+        menu_update_colors(mn);
       }
       if (*menu_mode == 0) {
         win_init(win, *grid, GetScreenWidth() - SCREEN_MARGIN,
@@ -75,12 +82,13 @@ void menu_loop(menu *mn, struct win *win, struct grid **grid, int *menu_mode) {
     }
   }
   BeginDrawing();
-  ClearBackground(BLACK);
+  ClearBackground(g_theme.bg);
   menu_draw(mn);
   EndDrawing();
 }
 
 int main(void) {
+  next_theme();
   struct win win;
   struct grid *grid = 0;
 
@@ -96,12 +104,13 @@ int main(void) {
     if (menu_mode) {
       menu_loop(mn, &win, &grid, &menu_mode);
     } else {
-      game_loop(&win, grid);
+      game_loop(&win, grid, &menu_mode);
     }
   }
 
   CloseWindow();
   if (grid)
     grid_destroy(grid);
+  menu_destroy(mn);
   return 0;
 }

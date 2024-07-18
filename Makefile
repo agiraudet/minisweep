@@ -11,13 +11,14 @@ SRCS_DIR	:=	./src
 SRCS			:=	main.c \
 							menu.c \
 							win.c \
-							grid.c
+							grid.c \
+							theme.c
 
 OBJS			:=	$(SRCS:%.c=$(BUILD_DIR)/%.o)
 
 INC_FLAGS	:=	$(addprefix -I, $(INC_DIR))
 
-CXXFLAGS	:=	-MD -Wall -Wextra -Werror $(INC_FLAGS)
+CXXFLAGS	:=	-MD -Wall -Wextra -Werror $(INC_FLAGS) -g
 
 CXX				:=	gcc
 

@@ -25,13 +25,15 @@ int main(void) {
   struct grid *grid = grid_create(20, 20, 40);
   if (!grid)
     return 1;
-  win_init(&win, grid, SCREEN_WIDTH - SCREEN_MARGIN,
-           SCREEN_HEIGHT - SCREEN_MARGIN, SCREEN_MARGIN, SCREEN_MARGIN);
 
   SetTraceLogLevel(LOG_NONE);
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "minisweep");
   SetTargetFPS(30);
+
+  win_init(&win, grid, SCREEN_WIDTH - SCREEN_MARGIN,
+           SCREEN_HEIGHT - SCREEN_MARGIN, SCREEN_MARGIN, SCREEN_MARGIN);
+
   BeginDrawing();
   ClearBackground(BLACK);
   win_drawgrid(&win, grid);

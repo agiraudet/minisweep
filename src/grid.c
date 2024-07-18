@@ -84,6 +84,31 @@ void grid_incdata(struct grid *grid, size_t pos, void *data) {
     grid->cells[pos].data += 1;
 }
 
+void grid_decdata(struct grid *grid, size_t pos, void *data) {
+  (void)data;
+  if (!grid)
+    return;
+  if (pos < grid->ncells && grid->cells[pos].data != -1)
+    grid->cells[pos].data -= 1;
+}
+
+void grid_countbomb(struct grid *grid, size_t pos, void *data) {
+  size_t *count = data;
+  if (!grid)
+    return;
+  if (grid->cells[pos].data == -1)
+    *count += 1;
+}
+
+void grid_putonebomb(struct grid *grid) {
+  size_t pos;
+  do {
+    pos = rand() % grid->ncells;
+  } while (grid->cells[pos].data == -1);
+  grid->cells[pos].data = -1;
+  grid_foreacharound(grid, pos, 0, &grid_incdata);
+}
+
 void grid_putbombs(struct grid *grid) {
   size_t nbombs;
 
@@ -92,12 +117,7 @@ void grid_putbombs(struct grid *grid) {
   nbombs = grid->nbombs;
   srand(time(NULL));
   while (nbombs) {
-    size_t pos;
-    do {
-      pos = rand() % grid->ncells;
-    } while (grid->cells[pos].data == -1);
-    grid->cells[pos].data = -1;
-    grid_foreacharound(grid, pos, 0, &grid_incdata);
+    grid_putonebomb(grid);
     nbombs--;
   }
 }
@@ -146,4 +166,14 @@ int grid_checkwin(struct grid *grid) {
   if (nrevealed == grid->ncells - grid->nbombs)
     return 1;
   return 0;
+}
+
+void grid_cheatbomb(struct grid *grid, size_t pos) {
+  if (!grid)
+    return;
+  grid_putonebomb(grid);
+  size_t bombAround = 0;
+  grid_foreacharound(grid, pos, &bombAround, &grid_countbomb);
+  grid->cells[pos].data = bombAround;
+  grid_foreacharound(grid, pos, 0, &grid_decdata);
 }

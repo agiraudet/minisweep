@@ -30,5 +30,6 @@ void grid_putbombs(struct grid *grid);
 void grid_revealbombs(struct grid *grid);
 void grid_revealaroundcell(struct grid *grid, size_t pos);
 int grid_checkwin(struct grid *grid);
+void grid_cheatbomb(struct grid *grid, size_t pos);
 
 #endif

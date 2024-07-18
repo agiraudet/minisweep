@@ -2,7 +2,8 @@
 #include "grid.h"
 #include "raylib.h"
 #include <stdint.h>
-#include <stdio.h>
+
+#define DEBUG_BOMB 1
 
 static size_t min(size_t a, size_t b) { return a <= b ? a : b; }
 
@@ -50,6 +51,8 @@ void win_init(struct win *win, struct grid *grid, size_t width, size_t height,
 }
 
 Color win_getcellcolor(struct cell *cell) {
+  if (cell->data == -1 && DEBUG_BOMB)
+    return SKYBLUE;
   if (cell->status == HIDDEN)
     return DARKGRAY;
   if (cell->status == FLAGGED)
@@ -106,11 +109,14 @@ void win_onrclic(struct win *win, struct grid *grid, int x, int y) {
 }
 
 void win_onlclic(struct win *win, struct grid *grid, int x, int y) {
-  if (!win_clicisinwin(win, grid, x, y)) {
-    printf("otb\n");
+  static int first_clic = 1;
+
+  if (!win_clicisinwin(win, grid, x, y))
     return;
-  }
   size_t pos = win_posfromxy(win, grid, x, y);
+  if (first_clic && grid->cells[pos].data == -1)
+    grid_cheatbomb(grid, pos);
+  first_clic = 0;
   if (grid->cells[pos].status == REVEALED)
     grid_revealaroundcell(grid, pos);
   else

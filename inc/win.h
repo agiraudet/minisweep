@@ -11,6 +11,8 @@ struct win {
   size_t height;
   size_t offx;
   size_t offy;
+  size_t absw;
+  size_t absh;
   size_t cell_size;
   size_t margin;
   size_t draw_size;
@@ -23,5 +25,7 @@ void win_drawcell(struct win *win, struct grid *grid, size_t pos);
 void win_drawgrid(struct win *win, struct grid *grid);
 void win_onlclic(struct win *win, struct grid *grid, int x, int y);
 void win_onrclic(struct win *win, struct grid *grid, int x, int y);
+void win_printtimer(struct win *win, double time);
+void win_formattime(double timer, char *buffer, size_t buffer_size);
 
 #endif

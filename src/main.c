@@ -6,7 +6,19 @@
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 800
-#define SCREEN_MARGIN 5
+#define SCREEN_MARGIN 50
+
+void msg_end(struct grid *grid) {
+  if (grid->game_status == 1) {
+    char buf[25];
+    win_formattime(grid->time_end - grid->time_start, buf, 24);
+    printf(
+        "\033[1;31mCongratulation !!!\033[0m\nWon %lux%lu (%lu bombs) in %s\n",
+        grid->width, grid->height, grid->nbombs, buf);
+  } else {
+    printf("Oh no...\n");
+  }
+}
 
 int main(void) {
   struct win win;
@@ -25,29 +37,30 @@ int main(void) {
   win_drawgrid(&win, grid);
   EndDrawing();
 
-  int game_status = 0;
-
   while (!WindowShouldClose()) {
     if (IsWindowResized()) {
       win_init(&win, grid, GetScreenWidth() - SCREEN_MARGIN,
                GetScreenHeight() - SCREEN_MARGIN, SCREEN_MARGIN, SCREEN_MARGIN);
-      ClearBackground(BLACK);
     }
-    if (game_status == 0) {
+    if (grid->game_status == 0) {
       if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         win_onlclic(&win, grid, GetMouseX(), GetMouseY());
-        game_status = grid_checkwin(grid);
-        if (game_status == 1)
-          printf("Congrats !! You won\n");
-        else if (game_status == -1)
-          printf("Oh no...\n");
+        if (grid_checkwin(grid) != 0) {
+          grid->time_end = GetTime();
+          msg_end(grid);
+        }
       }
       if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
         win_onrclic(&win, grid, GetMouseX(), GetMouseY());
       }
     }
     BeginDrawing();
+    ClearBackground(BLACK);
     win_drawgrid(&win, grid);
+    if (grid->game_status == 0)
+      win_printtimer(&win, GetTime() - grid->time_start);
+    else
+      win_printtimer(&win, grid->time_end);
     EndDrawing();
   }
 

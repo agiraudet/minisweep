@@ -1,4 +1,5 @@
 #include "grid.h"
+#include <raylib.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -58,6 +59,9 @@ struct grid *grid_create(size_t width, size_t height, size_t nbombs) {
   grid = malloc(sizeof(struct grid));
   if (!grid)
     return 0;
+  grid->time_start = GetTime();
+  grid->time_end = 0;
+  grid->game_status = 0;
   grid->nbombs = nbombs;
   grid->width = width;
   grid->height = height;
@@ -158,14 +162,19 @@ int grid_checkwin(struct grid *grid) {
   if (!grid)
     return 0;
   for (size_t i = 0; i < grid->ncells; i++) {
-    if (grid->cells[i].data == -1 && grid->cells[i].status == REVEALED)
-      return -1;
+    if (grid->cells[i].data == -1 && grid->cells[i].status == REVEALED) {
+      grid->game_status = -1;
+      return grid->game_status;
+    }
     if (grid->cells[i].status == REVEALED)
       nrevealed++;
   }
-  if (nrevealed == grid->ncells - grid->nbombs)
-    return 1;
-  return 0;
+  if (nrevealed == grid->ncells - grid->nbombs) {
+    grid->game_status = 1;
+    return grid->game_status;
+  }
+  grid->game_status = 0;
+  return grid->game_status;
 }
 
 void grid_cheatbomb(struct grid *grid, size_t pos) {

@@ -2,6 +2,8 @@
 #include "grid.h"
 #include "raylib.h"
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 #define DEBUG_BOMB 0
 
@@ -34,6 +36,8 @@ void number_draw(int8_t n, size_t x, size_t y, size_t size) {
 void win_adujstoffset(struct win *win, struct grid *grid) {
   win->offx = win->offx / 2 + (win->width - grid->width * win->cell_size) / 2;
   win->offy = win->offy / 2 + (win->height - grid->height * win->cell_size) / 2;
+  win->absw = GetScreenWidth();
+  win->absh = GetScreenHeight();
 }
 
 void win_init(struct win *win, struct grid *grid, size_t width, size_t height,
@@ -65,14 +69,17 @@ Color win_getcellcolor(struct cell *cell) {
 void win_drawcell(struct win *win, struct grid *grid, size_t pos) {
   struct cell *cell = &grid->cells[pos];
   Color color = win_getcellcolor(cell);
-  size_t pos_x = pos % grid->width * win->cell_size + win->margin;
-  size_t pos_y = pos / grid->width * win->cell_size + win->margin;
+  size_t pos_x = pos % grid->width * win->cell_size + win->margin + win->offx;
+  size_t pos_y = pos / grid->width * win->cell_size + win->margin + win->offy;
 
-  DrawRectangle(pos_x + win->offx, pos_y + win->offy, win->draw_size,
-                win->draw_size, color);
+  DrawRectangle(pos_x, pos_y, win->draw_size, win->draw_size, color);
   if (cell->status == REVEALED && cell->data > 0) {
-    number_draw(cell->data, pos_x + win->draw_size / 2 - 2 + win->offx,
-                pos_y + win->offy, win->draw_size);
+    char nbuf[] = {'0', 0};
+    nbuf[0] += cell->data;
+    size_t n_x =
+        win->cell_size / 2 - MeasureText(nbuf, win->draw_size) / 2 + pos_x;
+    size_t n_y = win->cell_size / 2 - win->draw_size / 2 + pos_y;
+    number_draw(cell->data, n_x, n_y, win->draw_size);
   }
 }
 
@@ -121,4 +128,26 @@ void win_onlclic(struct win *win, struct grid *grid, int x, int y) {
     grid_revealaroundcell(grid, pos);
   else
     grid_propagatecell(grid, pos, 0);
+}
+
+void win_formattime(double timer, char *buffer, size_t buffer_size) {
+  int hours = (int)timer / 3600;
+  int minutes = ((int)timer % 3600) / 60;
+  int seconds = (int)timer % 60;
+
+  if (hours > 0) {
+    snprintf(buffer, buffer_size, "%02d:%02d:%02d", hours, minutes, seconds);
+  } else {
+    snprintf(buffer, buffer_size, "%02d:%02d", minutes, seconds);
+  }
+}
+
+void win_printtimer(struct win *win, double time) {
+  char buf[25];
+
+  win_formattime(time, buf, 24);
+  size_t time_size = win->offy - 4;
+  int time_x = win->absw / 2 - MeasureText(buf, time_size) / 2;
+  int time_y = win->offy / 2 - time_size / 2;
+  DrawText(TextFormat("%s", buf), time_x, time_y, time_size, WHITE);
 }

@@ -56,19 +56,22 @@ void menu_loop(menu *mn, struct win *win, struct grid **grid, int *menu_mode) {
   }
   if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
     const char *str = menu_find_clic(mn, GetMouseX(), GetMouseY());
-    if (strcmp(str, "small") == 0) {
-      *grid = grid_create(10, 10, 10);
-      *menu_mode = 0;
-    } else if (strcmp(str, "medium") == 0) {
-      *grid = grid_create(20, 20, 40);
-      *menu_mode = 0;
-    } else if (strcmp(str, "large") == 0) {
-      *grid = grid_create(30, 30, 90);
-      *menu_mode = 0;
-    }
-    if (*menu_mode == 0) {
-      win_init(win, *grid, GetScreenWidth() - SCREEN_MARGIN,
-               GetScreenHeight() - SCREEN_MARGIN, SCREEN_MARGIN, SCREEN_MARGIN);
+    if (str) {
+      if (strcmp(str, "small") == 0) {
+        *grid = grid_create(10, 10, 10);
+        *menu_mode = 0;
+      } else if (strcmp(str, "medium") == 0) {
+        *grid = grid_create(20, 20, 40);
+        *menu_mode = 0;
+      } else if (strcmp(str, "large") == 0) {
+        *grid = grid_create(30, 30, 90);
+        *menu_mode = 0;
+      }
+      if (*menu_mode == 0) {
+        win_init(win, *grid, GetScreenWidth() - SCREEN_MARGIN,
+                 GetScreenHeight() - SCREEN_MARGIN, SCREEN_MARGIN,
+                 SCREEN_MARGIN);
+      }
     }
   }
   BeginDrawing();

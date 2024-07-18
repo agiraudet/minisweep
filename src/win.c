@@ -10,26 +10,6 @@
 static size_t min(size_t a, size_t b) { return a <= b ? a : b; }
 
 void number_draw(int8_t n, size_t x, size_t y, size_t size) {
-  // Color color;
-  // switch (n) {
-  // case 1:
-  //   color = DARKBLUE;
-  //   break;
-  // case 2:
-  //   color = DARKGREEN;
-  //   break;
-  // case 3:
-  //   color = RED;
-  //   break;
-  // case 4:
-  //   color = PURPLE;
-  //   break;
-  // case 5:
-  //   color = ORANGE;
-  //   break;
-  // default:
-  //   color = WHITE;
-  // }
   n = n <= 5 ? n : 0;
   DrawText(TextFormat("%i", n), x, y, size, g_theme.numbers[n]);
 }

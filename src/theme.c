@@ -34,9 +34,26 @@ void theme_candy() {
   g_theme.numbers[7] = DARKPURPLE; // Number 7
   g_theme.numbers[8] = DARKGRAY;   // Number 8
 }
+void theme_ocean() {
+  g_theme.bg = (Color){0, 105, 148, 255};
+  g_theme.flagged = (Color){255, 127, 80, 255};
+  g_theme.hidden = (Color){224, 255, 255, 255};
+  g_theme.cell = (Color){176, 224, 230, 255};
+  g_theme.bomb = (Color){255, 69, 0, 255};
+  g_theme.timer = (Color){255, 255, 224, 255};
+  g_theme.numbers[0] = (Color){255, 255, 255, 255};
+  g_theme.numbers[1] = (Color){0, 191, 255, 255};
+  g_theme.numbers[2] = (Color){34, 139, 34, 255};
+  g_theme.numbers[3] = (Color){255, 69, 0, 255};
+  g_theme.numbers[4] = (Color){153, 50, 204, 255};
+  g_theme.numbers[5] = (Color){255, 140, 0, 255};
+  g_theme.numbers[6] = (Color){72, 61, 139, 255};
+  g_theme.numbers[7] = (Color){75, 0, 130, 255};
+  g_theme.numbers[8] = (Color){47, 79, 79, 255};
+}
 
 void next_theme() {
-  void (*f[])(void) = {theme_default, theme_candy};
+  void (*f[])(void) = {theme_default, theme_candy, theme_ocean};
   static int i = 0;
 
   f[i]();

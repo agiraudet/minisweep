@@ -98,14 +98,12 @@ void win_onrclic(struct win *win, struct grid *grid, int x, int y) {
 }
 
 void win_onlclic(struct win *win, struct grid *grid, int x, int y) {
-  static int first_clic = 1;
-
   if (!win_clicisinwin(win, grid, x, y))
     return;
   size_t pos = win_posfromxy(win, grid, x, y);
-  if (first_clic && grid->cells[pos].data == -1)
+  if (grid->bomb_cheat && grid->cells[pos].data == -1)
     grid_cheatbomb(grid, pos);
-  first_clic = 0;
+  grid->bomb_cheat = 0;
   if (grid->cells[pos].status == REVEALED)
     grid_revealaroundcell(grid, pos);
   else if (grid->cells[pos].status == FLAGGED)

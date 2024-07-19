@@ -62,6 +62,7 @@ struct grid *grid_create(size_t width, size_t height, size_t nbombs) {
   grid->time_start = GetTime();
   grid->time_end = 0;
   grid->game_status = 0;
+  grid->bomb_cheat = 1;
   grid->nbombs = nbombs;
   grid->width = width;
   grid->height = height;

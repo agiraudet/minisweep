@@ -17,6 +17,7 @@ struct grid {
   double time_start;
   double time_end;
   int game_status;
+  int bomb_cheat;
   size_t nbombs;
   size_t ncells;
   size_t width;

@@ -133,7 +133,6 @@ int main(void) {
   while (!WindowShouldClose() && menu_mode != -1) {
     if (menu_mode) {
       menu_loop(mn, &win, &grid, &menu_mode);
-      // menu_loop(endmn, &win, &grid, &menu_mode);
     } else {
       game_loop(&win, grid, endmn, &menu_mode);
     }

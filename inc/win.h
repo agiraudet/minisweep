@@ -16,6 +16,7 @@ struct win {
   size_t cell_size;
   size_t margin;
   size_t draw_size;
+  int first_clic;
 };
 
 void number_draw(int8_t n, size_t x, size_t y, size_t size);

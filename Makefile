@@ -30,11 +30,10 @@ else ifeq ($(UNAME_S),Darwin)
 	LIB_INC_DIR := /opt/homebrew/opt/raylib/include
 	LDFLAGS := -L$(LIB_DIR) -Wl,-rpath,$(LIB_DIR) -lraylib
 	INC_FLAGS += -I$(LIB_INC_DIR)
-	CXXFLAGS += $(LDFLAGS)
 endif
 
 $(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(OBJS) -o $@
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $@ $(LDFLAGS)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)

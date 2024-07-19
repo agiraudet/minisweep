@@ -111,15 +111,6 @@ void menu_draw(t_menu *mn) {
   menu_draw_subtitle(mn);
 }
 
-// void menu_update_colors(t_menu *mn) {
-//   for (size_t i = 0; i < mn->nbut; i++) {
-//     t_button *but = &mn->butlst[i];
-//     but->color = g_theme.cell;
-//     but->border_color = g_theme.timer;
-//     but->label_color = g_theme.timer;
-//   }
-// }
-
 void menu_mov(t_menu *mn, int x, int y) {
   mn->x = x;
   mn->y = y;
@@ -191,6 +182,12 @@ void menu_settitle(t_menu *mn, const char *new_title) {
   mn->title = strdup(new_title);
 }
 
+void menu_setsubtitle(t_menu *mn, const char *new_title) {
+  if (mn->subtitle)
+    free(mn->subtitle);
+  mn->subtitle = strdup(new_title);
+}
+
 t_menu *menu_create_main(size_t winw, size_t winh) {
   const char *labels[] = {"small", "medium", "large", "change theme"};
 
@@ -247,9 +244,3 @@ t_menu *menu_create_end(size_t winw, size_t winh) {
   menu_update_pos(mn);
   return mn;
 }
-
-// t_popup *popup_create_end(size_t w, size_t h) {
-//   t_popup pup = malloc(sizeof(t_popup));
-//   pup.msg = strdup("popup");
-//   pup.mn = menu_create_end(w, h);
-// }

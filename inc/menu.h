@@ -38,11 +38,12 @@ void menu_draw(t_menu *mn);
 const char *menu_find_clic(t_menu *mn, int x, int y);
 const char *menu_find_dragorclic(t_menu *mn, int x, int y);
 void menu_destroy(t_menu *mn);
-/*void menu_update_colors(t_menu *mn);*/
 void menu_update_size(t_menu *mn, size_t w, size_t h);
 t_menu *menu_create_end(size_t winw, size_t winh);
 void menu_mov(t_menu *mn, int x, int y);
 void menu_movdrag(t_menu *mn);
 void menu_undrag(t_menu *mn);
+void menu_setsubtitle(t_menu *mn, const char *new_title);
+void menu_settitle(t_menu *mn, const char *new_title);
 
 #endif

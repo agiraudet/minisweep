@@ -4,28 +4,15 @@
 #include "theme.h"
 #include "win.h"
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 800
 #define SCREEN_MARGIN 50
 
-void msg_end(struct grid *grid) {
-  if (grid->game_status == 1) {
-    char buf[25];
-    win_formattime(grid->time_end - grid->time_start, buf, 24);
-    printf(
-        "\033[1;31mCongratulation !!!\033[0m\nWon %lux%lu (%lu bombs) in %s\n",
-        grid->width, grid->height, grid->nbombs, buf);
-  } else {
-    printf("Oh no...\n");
-  }
-}
-
-void game_loop(struct win *win, struct grid *grid, t_menu *endmn,
+void game_loop(struct win *win, struct grid **gridptr, t_menu *endmn,
                int *menu_mode) {
+  struct grid *grid = *gridptr;
   if (IsWindowResized()) {
     int sw = GetScreenWidth();
     int sh = GetScreenHeight();
@@ -39,15 +26,11 @@ void game_loop(struct win *win, struct grid *grid, t_menu *endmn,
       win_onlclic(win, grid, GetMouseX(), GetMouseY());
       if (grid_checkwin(grid) != 0) {
         grid->time_end = GetTime();
-        if (endmn->subtitle)
-          free(endmn->subtitle);
-        endmn->subtitle = malloc(sizeof(char) * 25);
-        win_formattime(grid->time_end, endmn->subtitle, 25);
-        if (endmn->title)
-          free(endmn->title);
-        endmn->title = grid->game_status == 1 ? strdup("   Yay!   ")
-                                              : strdup("   Oh no   ");
-        (void)menu_mode;
+        char buf[25];
+        win_formattime(grid->time_end, buf, 25);
+        menu_setsubtitle(endmn, buf);
+        menu_settitle(endmn, grid->game_status == 1 ? strdup("   Yay!   ")
+                                                    : strdup("   Oh no   "));
       }
     }
     if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
@@ -62,6 +45,7 @@ void game_loop(struct win *win, struct grid *grid, t_menu *endmn,
         else if (strcmp(str, "menu") == 0) {
           *menu_mode = 1;
           grid_destroy(grid);
+          *gridptr = 0;
         }
       }
     } else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
@@ -134,7 +118,7 @@ int main(void) {
     if (menu_mode) {
       menu_loop(mn, &win, &grid, &menu_mode);
     } else {
-      game_loop(&win, grid, endmn, &menu_mode);
+      game_loop(&win, &grid, endmn, &menu_mode);
     }
   }
 

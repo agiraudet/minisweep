@@ -1,11 +1,7 @@
 NAME			:=	minisweep
 
-DEPS			:=	-lraylib
-
 BUILD_DIR	:=	./build
-
 INC_DIR		:=	./inc
-
 SRCS_DIR	:=	./src
 
 SRCS			:=	main.c \
@@ -15,21 +11,32 @@ SRCS			:=	main.c \
 							theme.c
 
 OBJS			:=	$(SRCS:%.c=$(BUILD_DIR)/%.o)
-
 INC_FLAGS	:=	$(addprefix -I, $(INC_DIR))
 
-CXXFLAGS	:=	-MD -Wall -Wextra -Werror $(INC_FLAGS) -g
-
+CXXFLAGS	:=	-MD -Wall -Wextra -Werror $(INC_FLAGS) -O3
 CXX				:=	gcc
 
+UNAME_S := $(shell uname -s)
+
+ifeq ($(UNAME_S),Linux)
+	DEPS := -lraylib
+	CXXFLAGS += $(DEPS)
+else ifeq ($(UNAME_S),Darwin)
+	LIB_DIR := /opt/homebrew/opt/raylib/lib
+	LIB_INC_DIR := /opt/homebrew/opt/raylib/include
+	LDFLAGS := -L$(LIB_DIR) -Wl,-rpath,$(LIB_DIR) -lraylib
+	INC_FLAGS += -I$(LIB_INC_DIR)
+	CXXFLAGS += $(LDFLAGS)
+endif
+
 $(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(OBJS) $(DEPS) -o $@ $(DEPS)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $@ $(LDFLAGS)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
 $(BUILD_DIR)/%.o: $(SRCS_DIR)/%.c | $(BUILD_DIR) $(HDR_ASM)
-	$(CXX) $(CXXFLAGS) -c $< -o $@ 
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 all: $(NAME)
 

@@ -1,6 +1,9 @@
 #include "theme.h"
 #include <raylib.h>
 
+// To add a theme, simply creata a new function for it, then add it in the f[]
+// array of next_theme()
+
 t_theme g_theme;
 
 Color ultocol(unsigned long color) {
@@ -12,6 +15,7 @@ Color ultocol(unsigned long color) {
   return rlColor;
 }
 
+// Defining theme using Raylib preset colors
 void theme_default() {
   g_theme.bg = BLACK;
   g_theme.flagged = YELLOW;
@@ -30,6 +34,7 @@ void theme_default() {
   g_theme.numbers[8] = BROWN;
 }
 
+// Defining theme using hex
 void theme_kandy() {
   g_theme.bg = ultocol(0xFF7199);
   g_theme.flagged = ultocol(0x52E595);
@@ -48,6 +53,8 @@ void theme_kandy() {
   g_theme.numbers[8] = ultocol(0x06D800);
 }
 
+// Defining theme using RGB
+// the Color struct is as follow: {r,g,b,a}
 void theme_ocean() {
   g_theme.bg = (Color){0, 105, 148, 255};
   g_theme.flagged = (Color){255, 127, 80, 255};

@@ -4,33 +4,45 @@
 #include "raylib.h"
 #include <stddef.h>
 
-typedef struct button {
+typedef struct s_button {
   Rectangle rect;
-  Color color;
+  Color *color;
   float round;
   float border_w;
-  Color border_color;
-  Color label_color;
+  Color *border_color;
+  Color *label_color;
   char *label;
-} button;
+} t_button;
 
-typedef struct menu {
-  button *butlst;
+typedef struct s_menu {
+  Color *bg;
+  char dir;
+  t_button *butlst;
+  size_t x;
+  size_t y;
   size_t nbut;
   size_t win_w;
   size_t win_h;
   size_t pan;
-} menu;
+  char *title;
+  char *subtitle;
+  int border_w;
+  int draggable;
+  int dragged;
+  int dragX;
+  int dragY;
+} t_menu;
 
-void button_init(button *but, const char *label);
-void button_drawlabel(button *but);
-void button_draw(button *but);
-void menu_update_pos(menu *mn);
-void menu_update_size(menu *mn, size_t w, size_t h);
-menu *menu_create_main(size_t winw, size_t winh);
-void menu_draw(menu *mn);
-const char *menu_find_clic(menu *mn, int x, int y);
-void menu_destroy(menu *mn);
-void menu_update_colors(menu *mn);
+t_menu *menu_create_main(size_t winw, size_t winh);
+void menu_draw(t_menu *mn);
+const char *menu_find_clic(t_menu *mn, int x, int y);
+const char *menu_find_dragorclic(t_menu *mn, int x, int y);
+void menu_destroy(t_menu *mn);
+/*void menu_update_colors(t_menu *mn);*/
+void menu_update_size(t_menu *mn, size_t w, size_t h);
+t_menu *menu_create_end(size_t winw, size_t winh);
+void menu_mov(t_menu *mn, int x, int y);
+void menu_movdrag(t_menu *mn);
+void menu_undrag(t_menu *mn);
 
 #endif

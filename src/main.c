@@ -5,6 +5,7 @@
 #include "win.h"
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define SCREEN_WIDTH 800
@@ -23,37 +24,64 @@ void msg_end(struct grid *grid) {
   }
 }
 
-void game_loop(struct win *win, struct grid *grid, int *menu_mode) {
+void game_loop(struct win *win, struct grid *grid, t_menu *endmn,
+               int *menu_mode) {
   if (IsWindowResized()) {
-    win_init(win, grid, GetScreenWidth() - SCREEN_MARGIN,
-             GetScreenHeight() - SCREEN_MARGIN, SCREEN_MARGIN, SCREEN_MARGIN);
+    int sw = GetScreenWidth();
+    int sh = GetScreenHeight();
+    win_init(win, grid, sw - SCREEN_MARGIN, sh - SCREEN_MARGIN, SCREEN_MARGIN,
+             SCREEN_MARGIN);
+    endmn->x = sw / 2 - endmn->win_w / 2;
+    endmn->y = sh / 2 - endmn->win_h / 2;
   }
   if (grid->game_status == 0) {
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
       win_onlclic(win, grid, GetMouseX(), GetMouseY());
       if (grid_checkwin(grid) != 0) {
         grid->time_end = GetTime();
-        msg_end(grid);
+        if (endmn->subtitle)
+          free(endmn->subtitle);
+        endmn->subtitle = malloc(sizeof(char) * 25);
+        win_formattime(grid->time_end, endmn->subtitle, 25);
+        if (endmn->title)
+          free(endmn->title);
+        endmn->title = grid->game_status == 1 ? strdup("   Yay!   ")
+                                              : strdup("   Oh no   ");
         (void)menu_mode;
-        // *menu_mode = 1;
-        // grid_destroy(grid);
       }
     }
     if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
       win_onrclic(win, grid, GetMouseX(), GetMouseY());
     }
+  } else {
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+      const char *str = menu_find_dragorclic(endmn, GetMouseX(), GetMouseY());
+      if (str) {
+        if (strcmp(str, "quit") == 0)
+          *menu_mode = -1;
+        else if (strcmp(str, "menu") == 0) {
+          *menu_mode = 1;
+          grid_destroy(grid);
+        }
+      }
+    } else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
+      menu_undrag(endmn);
   }
+  menu_movdrag(endmn);
   BeginDrawing();
   ClearBackground(g_theme.bg);
   win_drawgrid(win, grid);
   if (grid->game_status == 0)
     win_printtimer(win, GetTime() - grid->time_start);
-  else
+  else {
     win_printtimer(win, grid->time_end);
+    menu_draw(endmn);
+  }
   EndDrawing();
 }
 
-void menu_loop(menu *mn, struct win *win, struct grid **grid, int *menu_mode) {
+void menu_loop(t_menu *mn, struct win *win, struct grid **grid,
+               int *menu_mode) {
 
   if (IsWindowResized()) {
     menu_update_size(mn, GetScreenWidth(), GetScreenHeight());
@@ -72,7 +100,6 @@ void menu_loop(menu *mn, struct win *win, struct grid **grid, int *menu_mode) {
         *menu_mode = 0;
       } else if (strcmp(str, "change theme") == 0) {
         next_theme();
-        menu_update_colors(mn);
       }
       if (*menu_mode == 0) {
         win_init(win, *grid, GetScreenWidth() - SCREEN_MARGIN,
@@ -97,14 +124,18 @@ int main(void) {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "minisweep");
   SetTargetFPS(30);
 
-  menu *mn = menu_create_main(SCREEN_WIDTH, SCREEN_HEIGHT);
+  t_menu *mn = menu_create_main(SCREEN_WIDTH, SCREEN_HEIGHT);
+  t_menu *endmn = menu_create_end(400, 200);
+  menu_mov(endmn, GetScreenWidth() / 2 - endmn->win_w / 2,
+           GetScreenHeight() / 2 - endmn->win_h / 2);
 
   int menu_mode = 1;
-  while (!WindowShouldClose()) {
+  while (!WindowShouldClose() && menu_mode != -1) {
     if (menu_mode) {
       menu_loop(mn, &win, &grid, &menu_mode);
+      // menu_loop(endmn, &win, &grid, &menu_mode);
     } else {
-      game_loop(&win, grid, &menu_mode);
+      game_loop(&win, grid, endmn, &menu_mode);
     }
   }
 
@@ -112,5 +143,6 @@ int main(void) {
   if (grid)
     grid_destroy(grid);
   menu_destroy(mn);
+  menu_destroy(endmn);
   return 0;
 }

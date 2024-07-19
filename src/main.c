@@ -72,6 +72,8 @@ void menu_loop(t_menu *mn, struct win *win, struct grid **grid,
   if (IsWindowResized()) {
     menu_update_size(mn, GetScreenWidth(), GetScreenHeight());
   }
+  if (IsKeyReleased(KEY_F1))
+    next_theme();
   if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
     const char *str = menu_find_clic(mn, GetMouseX(), GetMouseY());
     if (str) {

@@ -1,7 +1,9 @@
 NAME			:=	minisweep
 
 BUILD_DIR	:=	./build
+
 INC_DIR		:=	./inc
+
 SRCS_DIR	:=	./src
 
 SRCS			:=	main.c \
@@ -11,9 +13,11 @@ SRCS			:=	main.c \
 							theme.c
 
 OBJS			:=	$(SRCS:%.c=$(BUILD_DIR)/%.o)
+
 INC_FLAGS	:=	$(addprefix -I, $(INC_DIR))
 
 CXXFLAGS	:=	-MD -Wall -Wextra -Werror $(INC_FLAGS) -O3
+
 CXX				:=	gcc
 
 UNAME_S := $(shell uname -s)
@@ -30,12 +34,12 @@ else ifeq ($(UNAME_S),Darwin)
 endif
 
 $(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(OBJS) -o $@ $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $@
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-$(BUILD_DIR)/%.o: $(SRCS_DIR)/%.c | $(BUILD_DIR) $(HDR_ASM)
+$(BUILD_DIR)/%.o: $(SRCS_DIR)/%.c | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 all: $(NAME)

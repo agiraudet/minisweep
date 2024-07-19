@@ -85,8 +85,8 @@ Clone the repository and build the game:
 
 **Warning:** on macOS, you might need to specify the path of the libs install via homebrew yourself. If you encounter issues, try to correct those lines in the Makefile:
 ```Makefile
-	LIB_DIR := /opt/homebrew/opt/raylib/lib
-	LIB_INC_DIR := /opt/homebrew/opt/raylib/include
+  LIB_DIR := /opt/homebrew/opt/raylib/lib
+  LIB_INC_DIR := /opt/homebrew/opt/raylib/include
 ```
 
 ## Gameplay

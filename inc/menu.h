@@ -18,12 +18,12 @@ typedef struct s_menu {
   Color *bg;
   char dir;
   t_button *butlst;
-  size_t x;
-  size_t y;
+  int x;
+  int y;
   size_t nbut;
-  size_t win_w;
-  size_t win_h;
-  size_t pan;
+  int win_w;
+  int win_h;
+  int pan;
   char *title;
   char *subtitle;
   int border_w;

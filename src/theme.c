@@ -1,6 +1,16 @@
 #include "theme.h"
+#include <raylib.h>
 
 t_theme g_theme;
+
+Color ultocol(unsigned long color) {
+  Color rlColor;
+  rlColor.r = (color >> 16) & 0xFF;
+  rlColor.g = (color >> 8) & 0xFF;
+  rlColor.b = color & 0xFF;
+  rlColor.a = 255;
+  return rlColor;
+}
 
 void theme_default() {
   g_theme.bg = BLACK;
@@ -15,31 +25,35 @@ void theme_default() {
   g_theme.numbers[3] = RED;
   g_theme.numbers[4] = PURPLE;
   g_theme.numbers[5] = ORANGE;
+  g_theme.numbers[6] = MAROON;
+  g_theme.numbers[7] = LIME;
+  g_theme.numbers[8] = BROWN;
 }
 
-void theme_candy() {
-  g_theme.bg = PINK;               // Background color
-  g_theme.flagged = MAGENTA;       // Flagged cells
-  g_theme.hidden = LIGHTGRAY;      // Hidden cells
-  g_theme.cell = WHITE;            // Revealed cells
-  g_theme.bomb = RED;              // Bombs
-  g_theme.timer = MAGENTA;         // Timer
-  g_theme.numbers[0] = WHITE;      // Default number color
-  g_theme.numbers[1] = BLUE;       // Number 1
-  g_theme.numbers[2] = GREEN;      // Number 2
-  g_theme.numbers[3] = ORANGE;     // Number 3
-  g_theme.numbers[4] = PURPLE;     // Number 4
-  g_theme.numbers[5] = GOLD;       // Number 5
-  g_theme.numbers[6] = VIOLET;     // Number 6
-  g_theme.numbers[7] = DARKPURPLE; // Number 7
-  g_theme.numbers[8] = DARKGRAY;   // Number 8
+void theme_kandy() {
+  g_theme.bg = ultocol(0xFF7199);
+  g_theme.flagged = ultocol(0x52E595);
+  g_theme.hidden = ultocol(0xFFE2EA);
+  g_theme.cell = ultocol(0xFFBADA0);
+  g_theme.bomb = ultocol(0xFF6533);
+  g_theme.timer = ultocol(0xF5F5F5);
+  g_theme.numbers[0] = ultocol(0xFFFFFF);
+  g_theme.numbers[1] = ultocol(0x278DFB);
+  g_theme.numbers[2] = ultocol(0x27FB68);
+  g_theme.numbers[3] = ultocol(0xD0D800);
+  g_theme.numbers[4] = ultocol(0xC100D8);
+  g_theme.numbers[5] = ultocol(0x00D8A1);
+  g_theme.numbers[6] = ultocol(0x06D800);
+  g_theme.numbers[7] = ultocol(0x06D800);
+  g_theme.numbers[8] = ultocol(0x06D800);
 }
+
 void theme_ocean() {
   g_theme.bg = (Color){0, 105, 148, 255};
   g_theme.flagged = (Color){255, 127, 80, 255};
   g_theme.hidden = (Color){224, 255, 255, 255};
   g_theme.cell = (Color){176, 224, 230, 255};
-  g_theme.bomb = (Color){255, 69, 0, 255};
+  g_theme.bomb = (Color){255, 10, 0, 255};
   g_theme.timer = (Color){255, 255, 224, 255};
   g_theme.numbers[0] = (Color){255, 255, 255, 255};
   g_theme.numbers[1] = (Color){0, 191, 255, 255};
@@ -53,7 +67,7 @@ void theme_ocean() {
 }
 
 void next_theme() {
-  void (*f[])(void) = {theme_default, theme_candy, theme_ocean};
+  void (*f[])(void) = {theme_default, theme_kandy, theme_ocean};
   static int i = 0;
 
   f[i]();

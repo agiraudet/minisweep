@@ -27,5 +27,6 @@ void win_onlclic(struct win *win, struct grid *grid, int x, int y);
 void win_onrclic(struct win *win, struct grid *grid, int x, int y);
 void win_printtimer(struct win *win, double time);
 void win_formattime(double timer, char *buffer, size_t buffer_size);
+void win_decorate(struct win *win);
 
 #endif

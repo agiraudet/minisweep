@@ -10,7 +10,7 @@
 static size_t min(size_t a, size_t b) { return a <= b ? a : b; }
 
 void number_draw(int8_t n, size_t x, size_t y, size_t size) {
-  n = n <= 5 ? n : 0;
+  n = n <= 9 ? n : 0;
   DrawText(TextFormat("%i", n), x, y, size, g_theme.numbers[n]);
 }
 
@@ -69,6 +69,7 @@ void win_drawgrid(struct win *win, struct grid *grid) {
     return;
   for (size_t i = 0; i < grid->ncells; i++)
     win_drawcell(win, grid, i);
+  win_decorate(win);
 }
 
 size_t win_posfromxy(struct win *win, struct grid *grid, int x, int y) {
@@ -123,12 +124,29 @@ void win_formattime(double timer, char *buffer, size_t buffer_size) {
   }
 }
 
+void win_decorate(struct win *win) {
+  int line_thick = win->offx <= win->offy ? win->offx / 3 : win->offy / 3;
+  DrawRectangle(win->offx / 2 - line_thick / 2, line_thick, line_thick,
+                win->absh - line_thick * 2, g_theme.timer);
+  DrawRectangle(win->absw - win->offx / 2 - line_thick / 2, line_thick,
+                line_thick, win->absh - line_thick * 2, g_theme.timer);
+  DrawRectangle(win->offx / 2 - line_thick / 2, win->absh - line_thick * 2,
+                win->absw - win->offx + 1, line_thick, g_theme.timer);
+  DrawRectangle(win->offx / 2 - line_thick / 2, line_thick,
+                (win->absw - win->offx) / 2 - (win->offy - 4) * 3, line_thick,
+                g_theme.timer);
+  DrawRectangle(win->absw / 2 + (win->offy - 4) * 3, line_thick,
+                (win->absw - win->offx) / 2 - (win->offy - 4) * 3, line_thick,
+                g_theme.timer);
+}
+
 void win_printtimer(struct win *win, double time) {
   char buf[25];
 
   win_formattime(time, buf, 24);
   size_t time_size = win->offy - 4;
-  int time_x = win->absw / 2 - MeasureText(buf, time_size) / 2;
+  int time_width = MeasureText(buf, time_size);
+  int time_x = win->absw / 2 - time_width / 2;
   int time_y = win->offy / 2 - time_size / 2;
   DrawText(TextFormat("%s", buf), time_x, time_y, time_size, g_theme.timer);
 }

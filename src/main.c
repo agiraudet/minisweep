@@ -17,7 +17,7 @@ void game_loop(struct win *win, struct grid **gridptr, t_menu *endmn,
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
       win_onlclic(win, grid, GetMouseX(), GetMouseY());
       if (grid_checkwin(grid) != 0) {
-        grid->time_end = GetTime();
+        grid->time_end = GetTime() - grid->time_start;
         char buf[25];
         win_formattime(grid->time_end, buf, 25);
         menu_setsubtitle(endmn, buf);

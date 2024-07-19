@@ -103,6 +103,8 @@ MiniSweep is a classic minesweeper game with the added ability to change themes.
 
 **Quick Reveal**: If you click on a revealed square that has a number, and the number of adjacent flagged squares matches that number, all adjacent non-flagged squares will be revealed.
 
+**Theme change**: You can change theme from the main menu, or by pressing F1 while in game.
+
 Enjoy the game!
 
 Feel free to contribute to the project by submitting issues or pull requests on the GitHub repository.

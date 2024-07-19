@@ -21,6 +21,8 @@ void game_loop(struct win *win, struct grid **gridptr, t_menu *endmn,
     endmn->x = sw / 2 - endmn->win_w / 2;
     endmn->y = sh / 2 - endmn->win_h / 2;
   }
+  if (IsKeyReleased(KEY_F1))
+    next_theme();
   if (grid->game_status == 0) {
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
       win_onlclic(win, grid, GetMouseX(), GetMouseY());

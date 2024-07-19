@@ -108,6 +108,8 @@ void win_onlclic(struct win *win, struct grid *grid, int x, int y) {
   first_clic = 0;
   if (grid->cells[pos].status == REVEALED)
     grid_revealaroundcell(grid, pos);
+  else if (grid->cells[pos].status == FLAGGED)
+    return;
   else
     grid_propagatecell(grid, pos, 0);
 }

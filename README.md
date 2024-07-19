@@ -22,11 +22,10 @@ A classic minesweeper game built in C with raylib.
 
 ## Screenshots
 
-### Main Menu with Ocean Theme
-![Menu Ocean Theme](doc/menu_ocean.png)
+*Pressing F1 allow for switching theme at any time*
 
-### In-Game Screenshot
-![In-Game](doc/game.png)
+![Themes](doc/theme.gif)
+
 
 ## Installation
 

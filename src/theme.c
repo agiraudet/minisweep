@@ -73,8 +73,63 @@ void theme_ocean() {
   g_theme.numbers[8] = (Color){47, 79, 79, 255};
 }
 
+void theme_sunset() {
+  g_theme.bg = ultocol(0xFF4500);         // Orange Red
+  g_theme.flagged = ultocol(0xFF6347);    // Tomato
+  g_theme.hidden = ultocol(0xFFD700);     // Gold
+  g_theme.cell = ultocol(0xFFA500);       // Orange
+  g_theme.bomb = ultocol(0x8B0000);       // Dark Red
+  g_theme.timer = ultocol(0xFFFFFF);      // White
+  g_theme.numbers[0] = ultocol(0xFFFFFF); // White
+  g_theme.numbers[1] = ultocol(0xFF4500); // Orange Red
+  g_theme.numbers[2] = ultocol(0xFF6347); // Tomato
+  g_theme.numbers[3] = ultocol(0xFFD700); // Gold
+  g_theme.numbers[4] = ultocol(0xFFA500); // Orange
+  g_theme.numbers[5] = ultocol(0xFF8C00); // Dark Orange
+  g_theme.numbers[6] = ultocol(0xFF4500); // Orange Red
+  g_theme.numbers[7] = ultocol(0xFF6347); // Tomato
+  g_theme.numbers[8] = ultocol(0xFFD700); // Gold
+}
+
+void theme_forest() {
+  g_theme.bg = ultocol(0x228B22);         // Forest Green
+  g_theme.flagged = ultocol(0x8B4513);    // Saddle Brown
+  g_theme.hidden = ultocol(0x556B2F);     // Dark Olive Green
+  g_theme.cell = ultocol(0x2E8B57);       // Sea Green
+  g_theme.bomb = ultocol(0x006400);       // Dark Green
+  g_theme.timer = ultocol(0xFFFFFF);      // White
+  g_theme.numbers[0] = ultocol(0xFFFFFF); // White
+  g_theme.numbers[1] = ultocol(0x00FF00); // Lime
+  g_theme.numbers[2] = ultocol(0x32CD32); // Lime Green
+  g_theme.numbers[3] = ultocol(0x9ACD32); // Yellow Green
+  g_theme.numbers[4] = ultocol(0x6B8E23); // Olive Drab
+  g_theme.numbers[5] = ultocol(0x228B22); // Forest Green
+  g_theme.numbers[6] = ultocol(0x006400); // Dark Green
+  g_theme.numbers[7] = ultocol(0x8B4513); // Saddle Brown
+  g_theme.numbers[8] = ultocol(0xA0522D); // Sienna
+}
+
+void theme_desert() {
+  g_theme.bg = ultocol(0xEDC9AF);         // Desert Sand
+  g_theme.flagged = ultocol(0xDAA520);    // Goldenrod
+  g_theme.hidden = ultocol(0xDEB887);     // Burly Wood
+  g_theme.cell = ultocol(0xD2B48C);       // Tan
+  g_theme.bomb = ultocol(0x8B4513);       // Saddle Brown
+  g_theme.timer = ultocol(0xFFFFFF);      // White
+  g_theme.numbers[0] = ultocol(0xFFFFFF); // White
+  g_theme.numbers[1] = ultocol(0xDAA520); // Goldenrod
+  g_theme.numbers[2] = ultocol(0xD2691E); // Chocolate
+  g_theme.numbers[3] = ultocol(0xCD853F); // Peru
+  g_theme.numbers[4] = ultocol(0xF4A460); // Sandy Brown
+  g_theme.numbers[5] = ultocol(0xA0522D); // Sienna
+  g_theme.numbers[6] = ultocol(0x8B4513); // Saddle Brown
+  g_theme.numbers[7] = ultocol(0xCD853F); // Peru
+  g_theme.numbers[8] = ultocol(0xDEB887); // Burly Wood
+}
+
 void next_theme() {
-  void (*f[])(void) = {theme_default, theme_kandy, theme_ocean};
+  void (*f[])(void) = {theme_default, theme_kandy,  theme_ocean,
+                       theme_sunset,  theme_forest, theme_desert};
   static int i = 0;
 
   f[i]();

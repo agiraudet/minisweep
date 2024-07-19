@@ -94,9 +94,13 @@ Clone the repository and build the game:
 MiniSweep is a classic minesweeper game with the added ability to change themes. Here's a quick rundown of the gameplay mechanics:
 
 **Objective**: Reveal all the squares on the grid that do not contain mines.
+
 **Revealing Squares**: Click on a square to reveal it. If it contains a mine, you lose the game.
+
 **Numbers**: Revealed squares show numbers indicating how many mines are adjacent to that square.
+
 **Flagging Mines**: Right-click to flag a square that you believe contains a mine.
+
 **Quick Reveal**: If you click on a revealed square that has a number, and the number of adjacent flagged squares matches that number, all adjacent non-flagged squares will be revealed.
 
 Enjoy the game!

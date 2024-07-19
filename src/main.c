@@ -13,16 +13,6 @@
 void game_loop(struct win *win, struct grid **gridptr, t_menu *endmn,
                int *menu_mode) {
   struct grid *grid = *gridptr;
-  if (IsWindowResized()) {
-    int sw = GetScreenWidth();
-    int sh = GetScreenHeight();
-    win_init(win, grid, sw - SCREEN_MARGIN, sh - SCREEN_MARGIN, SCREEN_MARGIN,
-             SCREEN_MARGIN);
-    endmn->x = sw / 2 - endmn->win_w / 2;
-    endmn->y = sh / 2 - endmn->win_h / 2;
-  }
-  if (IsKeyReleased(KEY_F1))
-    next_theme();
   if (grid->game_status == 0) {
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
       win_onlclic(win, grid, GetMouseX(), GetMouseY());
@@ -69,11 +59,6 @@ void game_loop(struct win *win, struct grid **gridptr, t_menu *endmn,
 void menu_loop(t_menu *mn, struct win *win, struct grid **grid,
                int *menu_mode) {
 
-  if (IsWindowResized()) {
-    menu_update_size(mn, GetScreenWidth(), GetScreenHeight());
-  }
-  if (IsKeyReleased(KEY_F1))
-    next_theme();
   if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
     const char *str = menu_find_clic(mn, GetMouseX(), GetMouseY());
     if (str) {
@@ -81,10 +66,10 @@ void menu_loop(t_menu *mn, struct win *win, struct grid **grid,
         *grid = grid_create(10, 10, 10);
         *menu_mode = 0;
       } else if (strcmp(str, "medium") == 0) {
-        *grid = grid_create(20, 20, 40);
+        *grid = grid_create(20, 20, 45);
         *menu_mode = 0;
       } else if (strcmp(str, "large") == 0) {
-        *grid = grid_create(30, 30, 90);
+        *grid = grid_create(30, 30, 150);
         *menu_mode = 0;
       } else if (strcmp(str, "change theme") == 0) {
         next_theme();
@@ -119,6 +104,18 @@ int main(void) {
 
   int menu_mode = 1;
   while (!WindowShouldClose() && menu_mode != -1) {
+    if (IsKeyReleased(KEY_F1))
+      next_theme();
+    if (IsWindowResized()) {
+      int sw = GetScreenWidth();
+      int sh = GetScreenHeight();
+      win_init(&win, grid, sw - SCREEN_MARGIN, sh - SCREEN_MARGIN,
+               SCREEN_MARGIN, SCREEN_MARGIN);
+      endmn->x = sw / 2 - endmn->win_w / 2;
+      endmn->y = sh / 2 - endmn->win_h / 2;
+      menu_update_size(endmn, endmn->win_w, endmn->win_h);
+      menu_update_size(mn, sw, sh);
+    }
     if (menu_mode) {
       menu_loop(mn, &win, &grid, &menu_mode);
     } else {

@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-void grid_foreacharound(struct grid *grid, size_t pos, void *data,
-                        void f(struct grid *, size_t, void *)) {
+void grid_foreacharound(t_grid *grid, size_t pos, void *data,
+                        void f(t_grid *, size_t, void *)) {
   if (!grid)
     return;
   if (pos % grid->width) {
@@ -39,8 +39,8 @@ void grid_foreacharound(struct grid *grid, size_t pos, void *data,
     f(grid, pos + grid->width, data);
 }
 
-void grid_propagatecell(struct grid *grid, size_t pos, void *data) {
-  struct cell *cell = &grid->cells[pos];
+void grid_propagatecell(t_grid *grid, size_t pos, void *data) {
+  t_cell *cell = &grid->cells[pos];
   (void)data;
 
   if (cell->status == REVEALED)
@@ -51,12 +51,12 @@ void grid_propagatecell(struct grid *grid, size_t pos, void *data) {
   }
 }
 
-struct grid *grid_create(size_t width, size_t height, size_t nbombs) {
-  struct grid *grid;
+t_grid *grid_create(size_t width, size_t height, size_t nbombs) {
+  t_grid *grid;
 
   if (nbombs > width * height)
     return 0;
-  grid = malloc(sizeof(struct grid));
+  grid = malloc(sizeof(t_grid));
   if (!grid)
     return 0;
   grid->time_start = GetTime();
@@ -67,7 +67,7 @@ struct grid *grid_create(size_t width, size_t height, size_t nbombs) {
   grid->width = width;
   grid->height = height;
   grid->ncells = width * height;
-  grid->cells = calloc(width * height, sizeof(struct cell));
+  grid->cells = calloc(width * height, sizeof(t_cell));
   if (!grid->cells) {
     free(grid);
     return 0;
@@ -76,12 +76,12 @@ struct grid *grid_create(size_t width, size_t height, size_t nbombs) {
   return grid;
 }
 
-void grid_destroy(struct grid *grid) {
+void grid_destroy(t_grid *grid) {
   free(grid->cells);
   free(grid);
 }
 
-void grid_incdata(struct grid *grid, size_t pos, void *data) {
+void grid_incdata(t_grid *grid, size_t pos, void *data) {
   (void)data;
   if (!grid)
     return;
@@ -89,7 +89,7 @@ void grid_incdata(struct grid *grid, size_t pos, void *data) {
     grid->cells[pos].data += 1;
 }
 
-void grid_decdata(struct grid *grid, size_t pos, void *data) {
+void grid_decdata(t_grid *grid, size_t pos, void *data) {
   (void)data;
   if (!grid)
     return;
@@ -97,7 +97,7 @@ void grid_decdata(struct grid *grid, size_t pos, void *data) {
     grid->cells[pos].data -= 1;
 }
 
-void grid_countbomb(struct grid *grid, size_t pos, void *data) {
+void grid_countbomb(t_grid *grid, size_t pos, void *data) {
   size_t *count = data;
   if (!grid)
     return;
@@ -105,7 +105,7 @@ void grid_countbomb(struct grid *grid, size_t pos, void *data) {
     *count += 1;
 }
 
-void grid_putonebomb(struct grid *grid) {
+void grid_putonebomb(t_grid *grid) {
   size_t pos;
   do {
     pos = rand() % grid->ncells;
@@ -114,7 +114,7 @@ void grid_putonebomb(struct grid *grid) {
   grid_foreacharound(grid, pos, 0, &grid_incdata);
 }
 
-void grid_putbombs(struct grid *grid) {
+void grid_putbombs(t_grid *grid) {
   size_t nbombs;
 
   if (!grid)
@@ -127,7 +127,7 @@ void grid_putbombs(struct grid *grid) {
   }
 }
 
-void grid_revealbombs(struct grid *grid) {
+void grid_revealbombs(t_grid *grid) {
   if (!grid)
     return;
   for (size_t i = 0; i < grid->ncells; i++) {
@@ -136,20 +136,20 @@ void grid_revealbombs(struct grid *grid) {
   }
 }
 
-void grid_countflaggedcell(struct grid *grid, size_t pos, void *data) {
+void grid_countflaggedcell(t_grid *grid, size_t pos, void *data) {
   int8_t *count = data;
 
   if (grid->cells[pos].status == FLAGGED)
     (*count)++;
 }
 
-void grid_setrevaroundcell(struct grid *grid, size_t pos, void *data) {
+void grid_setrevaroundcell(t_grid *grid, size_t pos, void *data) {
   (void)data;
   if (grid->cells[pos].status != FLAGGED)
     grid_propagatecell(grid, pos, 0);
 }
 
-void grid_revealaroundcell(struct grid *grid, size_t pos) {
+void grid_revealaroundcell(t_grid *grid, size_t pos) {
   if (!grid || grid->cells[pos].status != REVEALED)
     return;
   int8_t count = 0;
@@ -158,7 +158,7 @@ void grid_revealaroundcell(struct grid *grid, size_t pos) {
     grid_foreacharound(grid, pos, 0, &grid_setrevaroundcell);
 }
 
-int grid_checkwin(struct grid *grid) {
+int grid_checkwin(t_grid *grid) {
   size_t nrevealed = 0;
   if (!grid)
     return 0;
@@ -178,7 +178,7 @@ int grid_checkwin(struct grid *grid) {
   return grid->game_status;
 }
 
-void grid_cheatbomb(struct grid *grid, size_t pos) {
+void grid_cheatbomb(t_grid *grid, size_t pos) {
   if (!grid)
     return;
   grid_putonebomb(grid);

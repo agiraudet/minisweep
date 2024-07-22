@@ -10,9 +10,8 @@
 #define SCREEN_HEIGHT 800
 #define SCREEN_MARGIN 50
 
-void game_loop(struct win *win, struct grid **gridptr, t_menu *endmn,
-               int *menu_mode) {
-  struct grid *grid = *gridptr;
+void game_loop(t_win *win, t_grid **gridptr, t_menu *endmn, int *menu_mode) {
+  t_grid *grid = *gridptr;
   if (grid->game_status == 0) {
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
       win_onlclic(win, grid, GetMouseX(), GetMouseY());
@@ -21,8 +20,8 @@ void game_loop(struct win *win, struct grid **gridptr, t_menu *endmn,
         char buf[25];
         win_formattime(grid->time_end, buf, 25);
         menu_setsubtitle(endmn, buf);
-        menu_settitle(endmn, grid->game_status == 1 ? strdup("   Yay!   ")
-                                                    : strdup("   Oh no   "));
+        menu_settitle(endmn,
+                      grid->game_status == 1 ? "   Yay!   " : "   Oh no   ");
       }
     }
     if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
@@ -38,6 +37,7 @@ void game_loop(struct win *win, struct grid **gridptr, t_menu *endmn,
           *menu_mode = 1;
           grid_destroy(grid);
           *gridptr = 0;
+          return;
         }
       }
     } else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
@@ -56,8 +56,7 @@ void game_loop(struct win *win, struct grid **gridptr, t_menu *endmn,
   EndDrawing();
 }
 
-void menu_loop(t_menu *mn, struct win *win, struct grid **grid,
-               int *menu_mode) {
+void menu_loop(t_menu *mn, t_win *win, t_grid **grid, int *menu_mode) {
 
   if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
     const char *str = menu_find_clic(mn, GetMouseX(), GetMouseY());
@@ -89,8 +88,8 @@ void menu_loop(t_menu *mn, struct win *win, struct grid **grid,
 
 int main(void) {
   next_theme();
-  struct win win;
-  struct grid *grid = 0;
+  t_win win;
+  t_grid *grid = 0;
 
   SetTraceLogLevel(LOG_NONE);
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);

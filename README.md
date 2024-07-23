@@ -110,7 +110,6 @@ Feel free to contribute to the project by submitting issues or pull requests on 
 
 Happy Sweeping!
 
-
 ## License
 
- This work is licensed under CC BY-NC 4.0 
+This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License - see the [LICENSE](LICENSE) file for details.

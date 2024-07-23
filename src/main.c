@@ -13,7 +13,7 @@
 void game_loop(t_win *win, t_grid **gridptr, t_menu *endmn, int *menu_mode) {
   t_grid *grid = *gridptr;
   if (grid->game_status == 0) {
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+    if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
       win_onlclic(win, grid, GetMouseX(), GetMouseY());
       if (grid_checkwin(grid) != 0) {
         grid->time_end = GetTime() - grid->time_start;
@@ -24,11 +24,11 @@ void game_loop(t_win *win, t_grid **gridptr, t_menu *endmn, int *menu_mode) {
                       grid->game_status == 1 ? "   Yay!   " : "   Oh no   ");
       }
     }
-    if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+    if (IsMouseButtonReleased(MOUSE_RIGHT_BUTTON)) {
       win_onrclic(win, grid, GetMouseX(), GetMouseY());
     }
   } else {
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+    if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
       const char *str = menu_find_dragorclic(endmn, GetMouseX(), GetMouseY());
       if (str) {
         if (strcmp(str, "quit") == 0)
@@ -58,7 +58,7 @@ void game_loop(t_win *win, t_grid **gridptr, t_menu *endmn, int *menu_mode) {
 
 void menu_loop(t_menu *mn, t_win *win, t_grid **grid, int *menu_mode) {
 
-  if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+  if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
     const char *str = menu_find_clic(mn, GetMouseX(), GetMouseY());
     if (str) {
       if (strcmp(str, "small") == 0) {

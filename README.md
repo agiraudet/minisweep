@@ -109,3 +109,8 @@ Enjoy the game!
 Feel free to contribute to the project by submitting issues or pull requests on the GitHub repository.
 
 Happy Sweeping!
+
+
+## License
+
+ This work is licensed under CC BY-NC 4.0 

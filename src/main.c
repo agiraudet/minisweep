@@ -1,19 +1,45 @@
 #include "grid.h"
 #include "menu.h"
 #include "raylib.h"
+#include "setting.h"
 #include "theme.h"
 #include "win.h"
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 800
 #define SCREEN_MARGIN 50
 
+t_setting g_setting;
+
+void defaut_setting(void) {
+  g_setting.double_click = 0;
+  g_setting.last_click = GetTime();
+  g_setting.double_click_delay = 0.3f;
+}
+
+int game_clic(void) {
+  if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+    if (g_setting.double_click == 0)
+      return 1;
+    else {
+      int ret = 0;
+      double current_time = GetTime();
+      if (current_time - g_setting.last_click <= g_setting.double_click_delay)
+        ret = 1;
+      g_setting.last_click = current_time;
+      return ret;
+    }
+  }
+  return 0;
+}
+
 void game_loop(t_win *win, t_grid **gridptr, t_menu *endmn, int *menu_mode) {
   t_grid *grid = *gridptr;
   if (grid->game_status == 0) {
-    if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+    if (game_clic()) {
       win_onlclic(win, grid, GetMouseX(), GetMouseY());
       if (grid_checkwin(grid) != 0) {
         grid->time_end = GetTime() - grid->time_start;
@@ -88,6 +114,7 @@ void menu_loop(t_menu *mn, t_win *win, t_grid **grid, int *menu_mode) {
 
 int main(void) {
   next_theme();
+  defaut_setting();
   t_win win;
   t_grid *grid = 0;
 
@@ -105,6 +132,10 @@ int main(void) {
   while (!WindowShouldClose() && menu_mode != -1) {
     if (IsKeyReleased(KEY_F1))
       next_theme();
+    if (IsKeyReleased(KEY_F2)) {
+      g_setting.double_click ^= 1;
+      printf("double click: %d\n", g_setting.double_click);
+    }
     if (IsWindowResized()) {
       int sw = GetScreenWidth();
       int sh = GetScreenHeight();

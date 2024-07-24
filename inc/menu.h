@@ -45,5 +45,6 @@ void menu_movdrag(t_menu *mn);
 void menu_undrag(t_menu *mn);
 void menu_setsubtitle(t_menu *mn, const char *new_title);
 void menu_settitle(t_menu *mn, const char *new_title);
+t_menu *menu_create_setting(size_t winw, size_t winh);
 
 #endif

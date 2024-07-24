@@ -244,3 +244,31 @@ t_menu *menu_create_end(size_t winw, size_t winh) {
   menu_update_pos(mn);
   return mn;
 }
+
+t_menu *menu_create_setting(size_t winw, size_t winh) {
+  const char *labels[] = {"enable double click", "cancel"};
+  t_menu *mn = malloc(sizeof(t_menu));
+  mn->dragged = 0;
+  mn->draggable = 1;
+  mn->dragX = 0;
+  mn->dragY = 0;
+  mn->bg = &g_theme.bg;
+  mn->border_w = 10;
+  mn->x = 100;
+  mn->y = 100;
+  mn->title = strdup("Settings");
+  mn->subtitle = 0;
+  mn->dir = 'v';
+  mn->win_w = winw;
+  mn->win_h = winh;
+  mn->nbut = 2;
+  mn->butlst = malloc(sizeof(t_button) * mn->nbut);
+  for (size_t i = 0; i < mn->nbut; i++) {
+    t_button *but = &mn->butlst[i];
+    button_init(&mn->butlst[i], labels[i]);
+    but->round = 0.2;
+    but->border_w = 2;
+  }
+  menu_update_pos(mn);
+  return mn;
+}

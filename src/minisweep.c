@@ -1,9 +1,11 @@
 #include "minisweep.h"
 #include "menu.h"
+#include "save.h"
 
 #include <raylib.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 void ms_setting_init(t_setting *sett) {
   sett->double_click = 0;
@@ -14,6 +16,9 @@ void ms_setting_init(t_setting *sett) {
 void ms_destroy(t_minisweep *ms) {
   if (!ms)
     return;
+  save_write(&ms->save_data);
+  if (ms->save_data.file_path)
+    free(ms->save_data.file_path);
   if (ms->grid)
     grid_destroy(ms->grid);
   if (ms->win)
@@ -31,6 +36,8 @@ t_minisweep *ms_create(void) {
   t_minisweep *ms = malloc(sizeof(t_minisweep));
   if (!ms)
     return 0;
+  save_init(&ms->save_data);
+  save_load(&ms->save_data);
   ms->alive = 1;
   ms->grid = 0;
   ms->win = malloc(sizeof(t_win));
@@ -55,6 +62,7 @@ t_minisweep *ms_create(void) {
            winh / 2 - ms->menus[END]->win_h / 2);
   ms->menus[SETTING] = 0;
   ms_setting_init(&ms->sett);
+  ms->sett.double_click = ms->save_data.double_clic;
   return ms;
 }
 
@@ -91,23 +99,41 @@ int ms_process_clicmenu(t_minisweep *ms, int clic_x, int clic_y) {
   return 0;
 }
 
+void process_endofgame(t_minisweep *ms) {
+  int new_pb = 0;
+  char buf[26];
+  ms->grid->time_end = GetTime() - ms->grid->time_start;
+  win_formattime(ms->grid->time_end, buf, 26);
+  if (ms->grid->game_status == 1 && ms->grid->hs &&
+      (ms->grid->time_end < *(ms->grid->hs) || *(ms->grid->hs) == 0)) {
+    *(ms->grid->hs) = ms->grid->time_end;
+    new_pb = 1;
+    // strncat(buf, "\nnew pb!", 51 - strlen(buf));
+  }
+  if (ms->grid->game_status == 1) {
+    if (new_pb)
+      menu_settitle(ms->menus[END], "  New PB!  ");
+    else
+      menu_settitle(ms->menus[END], "   Yay!   ");
+  } else
+    menu_settitle(ms->menus[END], "   Oh no   ");
+  menu_setsubtitle(ms->menus[END], buf);
+  ms->menus[END]->visible = 1;
+}
+
 void ms_process_clicgrid(t_minisweep *ms, int clic_x, int clic_y) {
   if (!ms || !ms->grid)
     return;
-  if (ms->grid->game_status != 0) {
-    printf("WTF\n");
-    return;
+  if (ms->sett.double_click) {
+    double current_time = GetTime();
+    if (current_time - ms->sett.last_click > ms->sett.double_click_delay) {
+      ms->sett.last_click = current_time;
+      return;
+    }
   }
   win_onlclic(ms->win, ms->grid, clic_x, clic_y);
-  if (grid_checkwin(ms->grid) != 0) {
-    char buf[25];
-    ms->grid->time_end = GetTime() - ms->grid->time_start;
-    win_formattime(ms->grid->time_end, buf, 25);
-    menu_settitle(ms->menus[END],
-                  ms->grid->game_status == 1 ? "   Yay!   " : "   Oh no   ");
-    menu_setsubtitle(ms->menus[END], buf);
-    ms->menus[END]->visible = 1;
-  }
+  if (grid_checkwin(ms->grid) != 0)
+    process_endofgame(ms);
 }
 
 void ms_process_input(t_minisweep *ms) {
@@ -117,12 +143,14 @@ void ms_process_input(t_minisweep *ms) {
     next_theme();
   if (IsKeyReleased(KEY_F2)) {
     ms->sett.double_click ^= 1;
+    ms->save_data.double_clic = ms->sett.double_click;
     printf("double click: %d\n", ms->sett.double_click);
   }
   if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
     int clic_x = GetMouseX();
     int clic_y = GetMouseY();
-    if (!ms_process_clicmenu(ms, clic_x, clic_y))
+    if (!ms_process_clicmenu(ms, clic_x, clic_y) && ms->grid &&
+        ms->grid->game_status == 0)
       ms_process_clicgrid(ms, clic_x, clic_y);
   }
   if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {

@@ -2,6 +2,7 @@
 #define MINISWEEP_H
 
 #include "menu.h"
+#include "save.h"
 #include "theme.h"
 #include "win.h"
 
@@ -24,6 +25,7 @@ typedef struct s_minisweep {
   t_win *win;
   t_grid *grid;
   t_setting sett;
+  t_save save_data;
   int alive;
 } t_minisweep;
 

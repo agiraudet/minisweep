@@ -11,6 +11,7 @@ SRCS			:=	main.c \
 							minisweep.c \
 							win.c \
 							grid.c \
+							save.c \
 							theme.c
 
 OBJS			:=	$(SRCS:%.c=$(BUILD_DIR)/%.o)

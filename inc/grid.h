@@ -16,6 +16,7 @@ typedef struct cell {
 typedef struct grid {
   double time_start;
   double time_end;
+  double *hs;
   int game_status;
   int bomb_cheat;
   size_t nbombs;

@@ -16,6 +16,7 @@ void ms_setting_init(t_setting *sett) {
 void ms_destroy(t_minisweep *ms) {
   if (!ms)
     return;
+  // save_writeraw(&ms->save_data);
   save_write(&ms->save_data);
   if (ms->save_data.file_path)
     free(ms->save_data.file_path);
@@ -37,6 +38,7 @@ t_minisweep *ms_create(void) {
   if (!ms)
     return 0;
   save_init(&ms->save_data);
+  // save_loadraw(&ms->save_data);
   save_load(&ms->save_data);
   ms->alive = 1;
   ms->grid = 0;

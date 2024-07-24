@@ -15,7 +15,7 @@ char *save_getpath(void) {
     home_dir = getpwuid(getuid())->pw_dir;
   }
   const char *config_dir = "/.config/minisweep/";
-  const char *file_name = "file";
+  const char *file_name = "save";
   size_t path_len =
       strlen(home_dir) + strlen(config_dir) + strlen(file_name) + 1;
   char *full_path = (char *)malloc(path_len);
@@ -26,6 +26,7 @@ char *save_getpath(void) {
 void save_init(t_save *save_data) {
   if (!save_data)
     return;
+  save_data->version = SAVE_VERSION;
   save_data->file_path = save_getpath();
   save_data->hs_small = 0;
   save_data->hs_medium = 0;
@@ -107,5 +108,54 @@ int save_write(t_save *save_data) {
   fprintf(file, "hs_large=%.2f\n", save_data->hs_large);
   fprintf(file, "double_clic=%d\n", save_data->double_clic);
   fclose(file);
+  return 0;
+}
+
+int save_writeraw(t_save *save_data) {
+  if (!save_data)
+    return -1;
+  char *dir_path = strdup(save_data->file_path);
+  if (dir_path == NULL)
+    return -1;
+  char *last_slash = strrchr(dir_path, '/');
+  if (last_slash != NULL) {
+    *last_slash = '\0';
+    if (save_create_directories(dir_path) != 0) {
+      free(dir_path);
+      return -1;
+    }
+  }
+  free(dir_path);
+  FILE *file = fopen(save_data->file_path, "wb");
+  if (file == NULL) {
+    perror("Failed to open save file for writing");
+    return -1;
+  }
+
+  if (fwrite(save_data, sizeof(t_save), 1, file) != 1) {
+    perror("Failed to write save data");
+    fclose(file);
+    return -1;
+  }
+
+  fclose(file);
+  return 0;
+}
+
+int save_loadraw(t_save *save_data) {
+  if (!save_data)
+    return -1;
+  FILE *file = fopen(save_data->file_path, "rb");
+  if (file == NULL) {
+    return -1;
+  }
+  if (fread(save_data, sizeof(t_save), 1, file) != 1) {
+    perror("Failed to read save data");
+    fclose(file);
+    return -1;
+  }
+  fclose(file);
+  if (save_data->version != SAVE_VERSION)
+    printf("Warning! Save file verison does not match binary\n");
   return 0;
 }

@@ -6,11 +6,13 @@
 #include "win.h"
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 800
 #define SCREEN_MARGIN 50
+#define N_MENUS 3
 
 t_setting g_setting;
 
@@ -41,8 +43,6 @@ void game_loop(t_win *win, t_grid **gridptr, t_menu *endmn, int *menu_mode) {
   if (grid->game_status == 0) {
     if (game_clic()) {
       win_onlclic(win, grid, GetMouseX(), GetMouseY());
-    }
-    if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
       if (grid_checkwin(grid) != 0) {
         grid->time_end = GetTime() - grid->time_start;
         char buf[25];
@@ -75,8 +75,12 @@ void game_loop(t_win *win, t_grid **gridptr, t_menu *endmn, int *menu_mode) {
   BeginDrawing();
   ClearBackground(g_theme.bg);
   win_drawgrid(win, grid);
-  if (grid->game_status != 0)
+  if (grid->game_status == 0)
+    win_printtimer(win, GetTime() - grid->time_start);
+  else {
+    win_printtimer(win, grid->time_end);
     menu_draw(endmn);
+  }
   EndDrawing();
 }
 
@@ -110,7 +114,7 @@ void menu_loop(t_menu *mn, t_win *win, t_grid **grid, int *menu_mode) {
   EndDrawing();
 }
 
-int main(void) {
+int main2(void) {
   next_theme();
   defaut_setting();
   t_win win;
@@ -156,5 +160,177 @@ int main(void) {
     grid_destroy(grid);
   menu_destroy(mn);
   menu_destroy(endmn);
+  return 0;
+}
+
+////////////////////////////////
+
+typedef struct s_minisweep {
+  t_menu **menus;
+  t_win *win;
+  t_grid *grid;
+  t_setting sett;
+  int alive;
+} t_minisweep;
+
+void ms_setting_init(t_setting *sett) {
+  sett->double_click = 0;
+  sett->last_click = GetTime();
+  sett->double_click_delay = 0.3f;
+}
+
+void ms_destroy(t_minisweep *ms) {
+  if (!ms)
+    return;
+  if (ms->grid)
+    grid_destroy(ms->grid);
+  if (ms->win)
+    free(ms->win);
+  t_menu *mn = *ms->menus;
+  while (mn)
+    menu_destroy(mn++);
+  if (ms->menus)
+    free(ms->menus);
+  free(ms);
+}
+
+t_minisweep *ms_create(void) {
+  t_minisweep *ms = malloc(sizeof(t_minisweep));
+  if (!ms)
+    return 0;
+  ms->alive = 1;
+  ms->grid = 0;
+  ms->win = malloc(sizeof(t_win));
+  if (!ms->win) {
+    ms_destroy(ms);
+    return 0;
+  }
+  ms->menus = calloc(N_MENUS + 1, sizeof(t_menu *));
+  size_t winw = GetScreenWidth();
+  size_t winh = GetScreenHeight();
+  ms->menus[0] = menu_create_main(winw, winh);
+  if (!ms->menus[0]) {
+    ms_destroy(ms);
+    return 0;
+  }
+  ms->menus[1] = menu_create_end(400, 200);
+  if (!ms->menus[1]) {
+    ms_destroy(ms);
+    return 0;
+  }
+  menu_mov(ms->menus[1], winw / 2 - ms->menus[1]->win_w / 2,
+           winh / 2 - ms->menus[1]->win_h / 2);
+  ms->menus[2] = 0;
+  ms_setting_init(&ms->sett);
+  return ms;
+}
+
+int ms_process_clicmenu(t_minisweep *ms, int clic_x, int clic_y) {
+  for (t_menu *mn = *ms->menus; mn; mn++) {
+    if (mn->visible) {
+      const char *str = menu_find_dragorclic(mn, clic_x, clic_y);
+      if (str) {
+        mn->onclic(mn, ms, str);
+        return 1;
+      }
+    }
+  }
+  return 0;
+}
+
+void ms_process_clicgrid(t_minisweep *ms, int clic_x, int clic_y) {
+  if (!ms || !ms->grid)
+    return;
+  if (ms->grid->game_status == 0) {
+    win_onlclic(ms->win, ms->grid, clic_x, clic_y);
+    if (grid_checkwin(ms->grid) != 0) {
+    }
+  }
+}
+
+void ms_process_input(t_minisweep *ms) {
+  if (!ms)
+    return;
+  if (IsKeyReleased(KEY_F1))
+    next_theme();
+  if (IsKeyReleased(KEY_F2)) {
+    ms->sett.double_click ^= 1;
+    printf("double click: %d\n", ms->sett.double_click);
+  }
+  if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+    int clic_x = GetMouseX();
+    int clic_y = GetMouseY();
+    if (!ms_process_clicmenu(ms, clic_x, clic_y)) {
+    }
+  }
+}
+
+void ms_draw(t_minisweep *ms) {
+  if (!ms)
+    return;
+  BeginDrawing();
+  ClearBackground(g_theme.bg);
+  if (ms->grid)
+    win_drawgrid(ms->win, ms->grid);
+  for (t_menu *mn = *ms->menus; mn; mn++) {
+    if (mn->visible)
+      menu_draw(mn);
+  }
+  EndDrawing();
+}
+
+void menu_main_onclic(t_menu *mn, t_minisweep *ms, const char *str) {
+
+  if (!str)
+    return;
+  if (strcmp(str, "small") == 0) {
+    ms->grid = grid_create(10, 10, 10);
+    mn->visible = 0;
+  } else if (strcmp(str, "medium") == 0) {
+    ms->grid = grid_create(20, 20, 45);
+    mn->visible = 0;
+  } else if (strcmp(str, "large") == 0) {
+    ms->grid = grid_create(30, 30, 150);
+    mn->visible = 0;
+  } else if (strcmp(str, "change theme") == 0) {
+    next_theme();
+  }
+  if (!mn->visible)
+    win_init(ms->win, ms->grid, GetScreenWidth() - SCREEN_MARGIN,
+             GetScreenHeight() - SCREEN_MARGIN, SCREEN_MARGIN, SCREEN_MARGIN);
+}
+
+void menu_end_onclic(t_menu *mn, t_minisweep *ms, const char *str) {
+  if (!str)
+    return;
+  if (strcmp(str, "quit") == 0)
+    ms->alive = 0;
+  else if (strcmp(str, "menu") == 0) {
+    grid_destroy(ms->grid);
+    ms->grid = 0;
+    return;
+  }
+}
+
+void init_raylib(void) {
+  SetTraceLogLevel(LOG_NONE);
+  SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+  InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "minisweep");
+  SetTargetFPS(30);
+}
+
+int main(void) {
+  init_raylib();
+  t_minisweep *ms = ms_create();
+  if (!ms) {
+    CloseWindow();
+    return 1;
+  }
+  while (!WindowShouldClose() && ms->alive) {
+    // pass
+  }
+
+  CloseWindow();
+  ms_destroy(ms);
   return 0;
 }

@@ -15,6 +15,7 @@ typedef struct s_button {
 } t_button;
 
 typedef struct s_menu {
+  int visible;
   Color *bg;
   char dir;
   t_button *butlst;

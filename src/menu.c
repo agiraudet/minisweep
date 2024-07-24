@@ -192,6 +192,7 @@ t_menu *menu_create_main(size_t winw, size_t winh) {
   const char *labels[] = {"small", "medium", "large", "change theme"};
 
   t_menu *mn = malloc(sizeof(t_menu));
+  mn->visible = 1;
   mn->dragged = 0;
   mn->draggable = 0;
   mn->dragX = 0;
@@ -220,6 +221,7 @@ t_menu *menu_create_main(size_t winw, size_t winh) {
 t_menu *menu_create_end(size_t winw, size_t winh) {
   const char *labels[] = {"menu", "quit"};
   t_menu *mn = malloc(sizeof(t_menu));
+  mn->visible = 0;
   mn->dragged = 0;
   mn->draggable = 1;
   mn->dragX = 0;
@@ -248,6 +250,7 @@ t_menu *menu_create_end(size_t winw, size_t winh) {
 t_menu *menu_create_setting(size_t winw, size_t winh) {
   const char *labels[] = {"enable double click", "cancel"};
   t_menu *mn = malloc(sizeof(t_menu));
+  mn->visible = 0;
   mn->dragged = 0;
   mn->draggable = 1;
   mn->dragX = 0;

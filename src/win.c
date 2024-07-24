@@ -70,6 +70,10 @@ void win_drawgrid(t_win *win, t_grid *grid) {
   for (size_t i = 0; i < grid->ncells; i++)
     win_drawcell(win, grid, i);
   win_decorate(win);
+  if (grid->game_status == 0)
+    win_printtimer(win, GetTime() - grid->time_start);
+  else
+    win_printtimer(win, grid->time_end);
 }
 
 size_t win_posfromxy(t_win *win, t_grid *grid, int x, int y) {

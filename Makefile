@@ -8,6 +8,7 @@ SRCS_DIR	:=	./src
 
 SRCS			:=	main.c \
 							menu.c \
+							minisweep.c \
 							win.c \
 							grid.c \
 							theme.c

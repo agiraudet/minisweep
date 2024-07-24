@@ -4,6 +4,8 @@
 #include "raylib.h"
 #include <stddef.h>
 
+typedef struct s_minisweep t_minisweep;
+
 typedef struct s_button {
   Rectangle rect;
   Color *color;
@@ -32,6 +34,7 @@ typedef struct s_menu {
   int dragged;
   int dragX;
   int dragY;
+  void (*onclic)(struct s_menu *mn, t_minisweep *ms, const char *str);
 } t_menu;
 
 t_menu *menu_create_main(size_t winw, size_t winh);
@@ -47,5 +50,7 @@ void menu_undrag(t_menu *mn);
 void menu_setsubtitle(t_menu *mn, const char *new_title);
 void menu_settitle(t_menu *mn, const char *new_title);
 t_menu *menu_create_setting(size_t winw, size_t winh);
+void menu_main_onclic(t_menu *mn, t_minisweep *ms, const char *str);
+void menu_end_onclic(t_menu *mn, t_minisweep *ms, const char *str);
 
 #endif

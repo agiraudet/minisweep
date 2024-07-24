@@ -1,5 +1,7 @@
 #include "menu.h"
+#include "minisweep.h"
 #include "theme.h"
+
 #include <raylib.h>
 #include <stdlib.h>
 #include <string.h>
@@ -93,6 +95,8 @@ void menu_draw_subtitle(t_menu *mn) {
 }
 
 void menu_draw(t_menu *mn) {
+  if (!mn)
+    return;
   DrawRectangle(mn->x, mn->y, mn->win_w, mn->win_h, *mn->bg);
   if (mn->border_w) {
     Color color = g_theme.timer;
@@ -118,6 +122,8 @@ void menu_mov(t_menu *mn, int x, int y) {
 }
 
 void menu_movdrag(t_menu *mn) {
+  if (!mn)
+    return;
   if (mn->draggable && mn->dragged) {
     int x = GetMouseX() - mn->dragX;
     int y = GetMouseY() - mn->dragY;
@@ -207,6 +213,7 @@ t_menu *menu_create_main(size_t winw, size_t winh) {
   mn->win_w = winw;
   mn->win_h = winh;
   mn->nbut = 4;
+  mn->onclic = menu_main_onclic;
   mn->butlst = malloc(sizeof(t_button) * mn->nbut);
   for (size_t i = 0; i < mn->nbut; i++) {
     t_button *but = &mn->butlst[i];
@@ -236,6 +243,7 @@ t_menu *menu_create_end(size_t winw, size_t winh) {
   mn->win_w = winw;
   mn->win_h = winh;
   mn->nbut = 2;
+  mn->onclic = menu_end_onclic;
   mn->butlst = malloc(sizeof(t_button) * mn->nbut);
   for (size_t i = 0; i < mn->nbut; i++) {
     t_button *but = &mn->butlst[i];
@@ -265,6 +273,7 @@ t_menu *menu_create_setting(size_t winw, size_t winh) {
   mn->win_w = winw;
   mn->win_h = winh;
   mn->nbut = 2;
+  mn->onclic = 0;
   mn->butlst = malloc(sizeof(t_button) * mn->nbut);
   for (size_t i = 0; i < mn->nbut; i++) {
     t_button *but = &mn->butlst[i];
@@ -274,4 +283,36 @@ t_menu *menu_create_setting(size_t winw, size_t winh) {
   }
   menu_update_pos(mn);
   return mn;
+}
+
+void menu_main_onclic(t_menu *mn, t_minisweep *ms, const char *str) {
+
+  if (!str)
+    return;
+  if (strcmp(str, "small") == 0) {
+    ms->grid = grid_create(10, 10, 10);
+  } else if (strcmp(str, "medium") == 0) {
+    ms->grid = grid_create(20, 20, 45);
+  } else if (strcmp(str, "large") == 0) {
+    ms->grid = grid_create(30, 30, 150);
+  } else if (strcmp(str, "change theme") == 0) {
+    next_theme();
+    return;
+  }
+  mn->visible = 0;
+  win_init(ms->win, ms->grid, GetScreenWidth() - SCREEN_MARGIN,
+           GetScreenHeight() - SCREEN_MARGIN, SCREEN_MARGIN, SCREEN_MARGIN);
+}
+
+void menu_end_onclic(t_menu *mn, t_minisweep *ms, const char *str) {
+  if (!str)
+    return;
+  if (strcmp(str, "quit") == 0)
+    ms->alive = 0;
+  else if (strcmp(str, "menu") == 0) {
+    grid_destroy(ms->grid);
+    ms->grid = 0;
+  }
+  mn->visible = 0;
+  ms->menus[MAIN]->visible = 1;
 }

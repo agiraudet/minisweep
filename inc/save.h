@@ -7,6 +7,7 @@
 
 typedef struct s_save {
   int version;
+  int theme_n;
   double hs_small;
   double hs_medium;
   double hs_large;

@@ -299,7 +299,7 @@ void menu_main_onclic(t_menu *mn, t_minisweep *ms, const char *str) {
     ms->grid = grid_create(30, 30, 150);
     ms->grid->hs = &ms->save_data.hs_large;
   } else if (strcmp(str, "change theme") == 0) {
-    next_theme();
+    theme_next();
     return;
   }
   mn->visible = 0;

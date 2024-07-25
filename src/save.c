@@ -27,6 +27,7 @@ void save_init(t_save *save_data) {
   if (!save_data)
     return;
   save_data->version = SAVE_VERSION;
+  save_data->theme_n = -1;
   save_data->hs_small = 0;
   save_data->hs_medium = 0;
   save_data->hs_large = 0;

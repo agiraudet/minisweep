@@ -127,12 +127,20 @@ void theme_desert() {
   g_theme.numbers[8] = ultocol(0xDEB887); // Burly Wood
 }
 
-void next_theme() {
+void theme_next() { theme_switch(-2); }
+
+int theme_switch(int n) {
   void (*f[])(void) = {theme_default, theme_kandy,  theme_ocean,
                        theme_sunset,  theme_forest, theme_desert};
   static int i = 0;
-
-  f[i]();
-
-  i = (i + 1) % (sizeof(f) / sizeof(f[0]));
+  if (n == -1) {
+    return i;
+  } else if (n == -2) {
+    i = (i + 1) % (sizeof(f) / sizeof(f[0]));
+    f[i]();
+  } else if (n < (int)(sizeof(f) / sizeof(f[0]))) {
+    i = n;
+    f[i]();
+  }
+  return i;
 }

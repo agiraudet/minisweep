@@ -11,7 +11,7 @@ void init_raylib(void) {
 
 int main(void) {
   init_raylib();
-  next_theme();
+  theme_next();
   t_minisweep *ms = ms_create();
   if (!ms) {
     CloseWindow();

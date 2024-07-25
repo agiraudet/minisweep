@@ -17,6 +17,7 @@ void ms_setting_init(t_setting *sett) {
 void ms_destroy(t_minisweep *ms) {
   if (!ms)
     return;
+  ms->save_data.theme_n = theme_switch(-1);
   save_writeraw(&ms->save_data, ms->sett.savefile_path);
   if (ms->sett.savefile_path)
     free(ms->sett.savefile_path);
@@ -39,6 +40,8 @@ t_minisweep *ms_create(void) {
   save_init(&ms->save_data);
   save_loadraw(&ms->save_data, ms->sett.savefile_path);
   ms->sett.double_click = ms->save_data.double_clic;
+  if (ms->save_data.theme_n >= 0)
+    theme_switch(ms->save_data.theme_n);
   ms->alive = 1;
   ms->grid = 0;
   ms->win = malloc(sizeof(t_win));
@@ -136,7 +139,7 @@ void ms_process_input(t_minisweep *ms) {
   if (!ms)
     return;
   if (IsKeyReleased(KEY_F1))
-    next_theme();
+    theme_next();
   if (IsKeyReleased(KEY_F2)) {
     ms->sett.double_click ^= 1;
     ms->save_data.double_clic = ms->sett.double_click;

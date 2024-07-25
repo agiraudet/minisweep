@@ -16,7 +16,8 @@ typedef struct s_theme {
 } t_theme;
 
 void theme_default();
-void next_theme();
+void theme_next();
+int theme_switch(int n);
 
 extern t_theme g_theme;
 #endif

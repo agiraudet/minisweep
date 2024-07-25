@@ -64,7 +64,9 @@ t_minisweep *ms_create(void) {
   }
   menu_mov(ms->menus[END], winw / 2 - ms->menus[END]->win_w / 2,
            winh / 2 - ms->menus[END]->win_h / 2);
-  ms->menus[SETTING] = 0;
+  ms->menus[SETTING] = menu_create_setting(350, 500);
+  menu_mov(ms->menus[SETTING], winw / 2 - ms->menus[SETTING]->win_w / 2,
+           winh / 2 - ms->menus[SETTING]->win_h / 2);
   return ms;
 }
 
@@ -85,15 +87,16 @@ void ms_process_resize(t_minisweep *ms) {
 }
 
 int ms_process_clicmenu(t_minisweep *ms, int clic_x, int clic_y) {
-  for (int i = 0; ms->menus[i]; i++) {
+  for (int i = N_MENU - 1; i >= 0; i--) {
     t_menu *mn = ms->menus[i];
+    if (!mn)
+      continue;
     if (mn->visible) {
       const char *str = menu_find_dragorclic(mn, clic_x, clic_y);
       if (str && mn->onclic) {
         mn->onclic(mn, ms, str);
         return 1;
       }
-      menu_undrag(mn);
     }
   }
   return 0;
@@ -145,12 +148,21 @@ void ms_process_input(t_minisweep *ms) {
     ms->save_data.double_clic = ms->sett.double_click;
     printf("double click: %d\n", ms->sett.double_click);
   }
-  if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+  if (IsKeyReleased(KEY_ESCAPE)) {
+    ms->menus[SETTING]->visible ^= 1;
+  }
+  if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
     int clic_x = GetMouseX();
     int clic_y = GetMouseY();
     if (!ms_process_clicmenu(ms, clic_x, clic_y) && ms->grid &&
         ms->grid->game_status == 0)
       ms_process_clicgrid(ms, clic_x, clic_y);
+  }
+  if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+    for (int i = 0; ms->menus[i]; i++) {
+      t_menu *mn = ms->menus[i];
+      menu_undrag(mn);
+    }
   }
   if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
     int clic_x = GetMouseX();

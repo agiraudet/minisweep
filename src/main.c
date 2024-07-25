@@ -7,6 +7,7 @@ void init_raylib(void) {
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "minisweep");
   SetTargetFPS(30);
+  SetExitKey(KEY_NULL);
 }
 
 int main(void) {

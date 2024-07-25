@@ -27,6 +27,7 @@ typedef struct s_menu {
   int win_w;
   int win_h;
   int pan;
+  float pan_mod;
   char *title;
   char *subtitle;
   int border_w;
@@ -52,5 +53,6 @@ void menu_settitle(t_menu *mn, const char *new_title);
 t_menu *menu_create_setting(size_t winw, size_t winh);
 void menu_main_onclic(t_menu *mn, t_minisweep *ms, const char *str);
 void menu_end_onclic(t_menu *mn, t_minisweep *ms, const char *str);
+void menu_setting_onclic(t_menu *mn, t_minisweep *ms, const char *str);
 
 #endif

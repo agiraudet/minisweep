@@ -3,7 +3,6 @@
 
 #include "menu.h"
 #include "save.h"
-#include "theme.h"
 #include "win.h"
 
 #define SCREEN_WIDTH 800
@@ -14,6 +13,7 @@ typedef struct s_setting {
   char double_click;
   double double_click_delay;
   double last_click;
+  char *savefile_path;
 } t_setting;
 
 extern t_setting g_setting;

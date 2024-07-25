@@ -1,8 +1,6 @@
 #include "minisweep.h"
-#include "save.h"
 #include "theme.h"
 #include <raylib.h>
-#include <string.h>
 
 void init_raylib(void) {
   SetTraceLogLevel(LOG_NONE);

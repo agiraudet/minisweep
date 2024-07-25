@@ -1,31 +1,29 @@
 #include "minisweep.h"
 #include "menu.h"
 #include "save.h"
+#include "theme.h"
 
 #include <raylib.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 void ms_setting_init(t_setting *sett) {
   sett->double_click = 0;
   sett->last_click = GetTime();
   sett->double_click_delay = 0.3f;
+  sett->savefile_path = save_getpath();
 }
 
 void ms_destroy(t_minisweep *ms) {
   if (!ms)
     return;
-  // save_writeraw(&ms->save_data);
-  save_write(&ms->save_data);
-  if (ms->save_data.file_path)
-    free(ms->save_data.file_path);
+  save_writeraw(&ms->save_data, ms->sett.savefile_path);
+  if (ms->sett.savefile_path)
+    free(ms->sett.savefile_path);
   if (ms->grid)
     grid_destroy(ms->grid);
   if (ms->win)
     free(ms->win);
-  // t_menu *mn = *ms->menus;
-  // while (mn)
   for (int i = 0; ms->menus[i]; i++)
     menu_destroy(ms->menus[i]);
   if (ms->menus)
@@ -37,9 +35,10 @@ t_minisweep *ms_create(void) {
   t_minisweep *ms = malloc(sizeof(t_minisweep));
   if (!ms)
     return 0;
+  ms_setting_init(&ms->sett);
   save_init(&ms->save_data);
-  // save_loadraw(&ms->save_data);
-  save_load(&ms->save_data);
+  save_loadraw(&ms->save_data, ms->sett.savefile_path);
+  ms->sett.double_click = ms->save_data.double_clic;
   ms->alive = 1;
   ms->grid = 0;
   ms->win = malloc(sizeof(t_win));
@@ -63,8 +62,6 @@ t_minisweep *ms_create(void) {
   menu_mov(ms->menus[END], winw / 2 - ms->menus[END]->win_w / 2,
            winh / 2 - ms->menus[END]->win_h / 2);
   ms->menus[SETTING] = 0;
-  ms_setting_init(&ms->sett);
-  ms->sett.double_click = ms->save_data.double_clic;
   return ms;
 }
 
@@ -73,7 +70,6 @@ void ms_process_resize(t_minisweep *ms) {
   int sh = GetScreenHeight();
   win_init(ms->win, ms->grid, sw - SCREEN_MARGIN, sh - SCREEN_MARGIN,
            SCREEN_MARGIN, SCREEN_MARGIN);
-  // for (t_menu *mn = ms->menus[0]; mn; mn++) {
   for (int i = 0; ms->menus[i]; i++) {
     t_menu *mn = ms->menus[i];
     if (mn->draggable) {
@@ -86,7 +82,6 @@ void ms_process_resize(t_minisweep *ms) {
 }
 
 int ms_process_clicmenu(t_minisweep *ms, int clic_x, int clic_y) {
-  // for (t_menu *mn = ms->menus[0]; mn; mn++) {
   for (int i = 0; ms->menus[i]; i++) {
     t_menu *mn = ms->menus[i];
     if (mn->visible) {
@@ -110,7 +105,6 @@ void process_endofgame(t_minisweep *ms) {
       (ms->grid->time_end < *(ms->grid->hs) || *(ms->grid->hs) == 0)) {
     *(ms->grid->hs) = ms->grid->time_end;
     new_pb = 1;
-    // strncat(buf, "\nnew pb!", 51 - strlen(buf));
   }
   if (ms->grid->game_status == 1) {
     if (new_pb)
@@ -161,7 +155,6 @@ void ms_process_input(t_minisweep *ms) {
     if (ms->grid && ms->grid->game_status == 0)
       win_onrclic(ms->win, ms->grid, clic_x, clic_y);
   }
-  // for (t_menu *mn = ms->menus[0]; mn; mn++)
   for (int i = 0; ms->menus[i]; i++) {
     t_menu *mn = ms->menus[i];
     menu_movdrag(mn);

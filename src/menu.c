@@ -63,8 +63,8 @@ void menu_update_pos(t_menu *mn) {
       but->rect.x = (float)mn->win_w / 2 - but->rect.width / 2 + mn->x;
       // but->rect.y = mn->y + mn->pan + but->rect.height * i +
       //               (i > 0 ? but->rect.height * i : 0);
-      but->rect.y = mn->y + (mn->win_h - mn->pan) / 2 + but->rect.height * i +
-                    (i > 0 ? but->rect.height * i : 0);
+      but->rect.y = mn->y + (float)(mn->win_h - mn->pan) / 2 +
+                    but->rect.height * i + (i > 0 ? but->rect.height * i : 0);
     }
   } else {
     mn->pan = mn->win_w / mn->pan_mod;
@@ -73,6 +73,8 @@ void menu_update_pos(t_menu *mn) {
       but->rect.width = (float)(mn->win_w - mn->pan * 2) / (mn->nbut * 2 - 1);
       but->rect.x = mn->x + mn->pan + but->rect.width * i +
                     (i > 0 ? but->rect.width * i : 0);
+      // but->rect.x = mn->x + (mn->win_w - mn->pan) / 2 + but->rect.width * i +
+      //               (i > 0 ? but->rect.height * i : 0);
       but->rect.y = (float)mn->win_h / 2 - but->rect.height / 2 + mn->y;
     }
   }
@@ -90,7 +92,11 @@ void menu_draw_title(t_menu *mn) {
   const char *title = mn->title;
   int fontSize = (mn->win_w) / strlen(title);
   int posX = mn->x + mn->win_w / 2 - MeasureText(title, fontSize) / 2;
-  int posY = mn->y + (mn->win_h - mn->pan) / 4 - fontSize / 2;
+  int posY;
+  if (mn->nbut)
+    posY = mn->y + (mn->win_h - mn->pan) / 4 - fontSize / 2;
+  else
+    posY = mn->y + mn->win_h / 3 - fontSize / 2;
   DrawText(title, posX, posY, fontSize, g_theme.timer);
 }
 
@@ -100,8 +106,12 @@ void menu_draw_subtitle(t_menu *mn) {
   const char *title = mn->subtitle;
   int fontSize = (mn->win_w) / strlen(title) / 2;
   int posX = mn->x + mn->win_w / 2 - MeasureText(title, fontSize) / 2;
-  DrawText(title, posX, mn->y + mn->win_h - (mn->pan / 2 + fontSize / 2),
-           fontSize, g_theme.timer);
+  int posY;
+  if (mn->nbut)
+    posY = mn->y + mn->win_h - (mn->pan / 2 + fontSize / 2);
+  else
+    posY = mn->y + mn->win_h - mn->win_h / 3 - fontSize / 2;
+  DrawText(title, posX, posY, fontSize, g_theme.timer);
 }
 
 void menu_draw(t_menu *mn) {
@@ -240,6 +250,7 @@ t_menu *menu_create_main(size_t winw, size_t winh) {
   mn->win_h = winh;
   mn->nbut = 3;
   mn->onclic = menu_main_onclic;
+  mn->onmouseover = menu_main_onmouseover;
   mn->butlst = malloc(sizeof(t_button) * mn->nbut);
   for (size_t i = 0; i < mn->nbut; i++) {
     t_button *but = &mn->butlst[i];
@@ -271,6 +282,7 @@ t_menu *menu_create_end(size_t winw, size_t winh) {
   mn->win_h = winh;
   mn->nbut = 2;
   mn->onclic = menu_end_onclic;
+  mn->onmouseover = 0;
   mn->butlst = malloc(sizeof(t_button) * mn->nbut);
   for (size_t i = 0; i < mn->nbut; i++) {
     t_button *but = &mn->butlst[i];
@@ -303,6 +315,7 @@ t_menu *menu_create_setting(size_t winw, size_t winh) {
   mn->win_h = winh;
   mn->nbut = 4;
   mn->onclic = menu_setting_onclic;
+  mn->onmouseover = 0;
   mn->butlst = malloc(sizeof(t_button) * mn->nbut);
   for (size_t i = 0; i < mn->nbut; i++) {
     t_button *but = &mn->butlst[i];
@@ -314,8 +327,32 @@ t_menu *menu_create_setting(size_t winw, size_t winh) {
   return mn;
 }
 
-void menu_main_onclic(t_menu *mn, t_minisweep *ms, const char *str) {
+t_menu *menu_create_score(size_t winw, size_t winh) {
+  t_menu *mn = malloc(sizeof(t_menu));
+  mn->visible = 0;
+  mn->dragged = 0;
+  mn->draggable = 0;
+  mn->dragX = 0;
+  mn->dragY = 0;
+  mn->bg = &g_theme.bg;
+  mn->border_w = 2;
+  mn->pan_mod = 1;
+  mn->x = 100;
+  mn->y = 100;
+  mn->title = strdup("Personal best:");
+  mn->subtitle = strdup("00:00");
+  mn->dir = 'v';
+  mn->win_w = winw;
+  mn->win_h = winh;
+  mn->nbut = 0;
+  mn->onclic = 0;
+  mn->onmouseover = 0;
+  mn->butlst = 0;
+  menu_update_pos(mn);
+  return mn;
+}
 
+void menu_main_onclic(t_menu *mn, t_minisweep *ms, const char *str) {
   if (!str)
     return;
   if (strcmp(str, "small") == 0) {
@@ -337,6 +374,24 @@ void menu_main_onclic(t_menu *mn, t_minisweep *ms, const char *str) {
     win_init(ms->win, ms->grid, GetScreenWidth() - SCREEN_MARGIN,
              GetScreenHeight() - SCREEN_MARGIN, SCREEN_MARGIN, SCREEN_MARGIN);
   }
+}
+
+void menu_main_onmouseover(t_menu *mn, t_minisweep *ms, const char *str) {
+  if (!str)
+    return;
+  (void)mn;
+  if (strcmp(str, "small") == 0) {
+    // menu_setsubtitle(ms->menus[SCORE],
+    ms->menus[SCORE]->visible = 1;
+    ms->menus[SCORE]->subtitle = ms->sett.hs_small;
+  } else if (strcmp(str, "medium") == 0) {
+    ms->menus[SCORE]->visible = 1;
+    ms->menus[SCORE]->subtitle = ms->sett.hs_medium;
+  } else if (strcmp(str, "large") == 0) {
+    ms->menus[SCORE]->visible = 1;
+    ms->menus[SCORE]->subtitle = ms->sett.hs_large;
+  } else
+    ms->menus[SCORE]->visible = 0;
 }
 
 void menu_end_onclic(t_menu *mn, t_minisweep *ms, const char *str) {

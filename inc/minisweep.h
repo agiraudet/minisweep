@@ -14,11 +14,14 @@ typedef struct s_setting {
   double double_click_delay;
   double last_click;
   char *savefile_path;
+  char hs_small[25];
+  char hs_medium[25];
+  char hs_large[25];
 } t_setting;
 
 extern t_setting g_setting;
 
-typedef enum { MAIN, END, SETTING, N_MENU } ms_menu;
+typedef enum { MAIN, END, SETTING, SCORE, N_MENU } ms_menu;
 
 typedef struct s_minisweep {
   t_menu **menus;
@@ -31,6 +34,7 @@ typedef struct s_minisweep {
 
 void ms_process_resize(t_minisweep *ms);
 void ms_process_input(t_minisweep *ms);
+void ms_process_mouseover(t_minisweep *ms);
 void ms_draw(t_minisweep *ms);
 void ms_destroy(t_minisweep *ms);
 t_minisweep *ms_create(void);

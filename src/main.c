@@ -21,6 +21,7 @@ int main(void) {
   while (!WindowShouldClose() && ms->alive) {
     if (IsWindowResized())
       ms_process_resize(ms);
+    ms_process_mouseover(ms);
     ms_process_input(ms);
     ms_draw(ms);
   }

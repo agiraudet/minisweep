@@ -36,6 +36,7 @@ typedef struct s_menu {
   int dragX;
   int dragY;
   void (*onclic)(struct s_menu *mn, t_minisweep *ms, const char *str);
+  void (*onmouseover)(struct s_menu *mn, t_minisweep *ms, const char *str);
 } t_menu;
 
 t_menu *menu_create_main(size_t winw, size_t winh);
@@ -54,5 +55,7 @@ t_menu *menu_create_setting(size_t winw, size_t winh);
 void menu_main_onclic(t_menu *mn, t_minisweep *ms, const char *str);
 void menu_end_onclic(t_menu *mn, t_minisweep *ms, const char *str);
 void menu_setting_onclic(t_menu *mn, t_minisweep *ms, const char *str);
+t_menu *menu_create_score(size_t winw, size_t winh);
+void menu_main_onmouseover(t_menu *mn, t_minisweep *ms, const char *str);
 
 #endif

@@ -57,5 +57,6 @@ void menu_end_onclic(t_menu *mn, t_minisweep *ms, const char *str);
 void menu_setting_onclic(t_menu *mn, t_minisweep *ms, const char *str);
 t_menu *menu_create_score(size_t winw, size_t winh);
 void menu_main_onmouseover(t_menu *mn, t_minisweep *ms, const char *str);
+void menu_update_pos(t_menu *mn);
 
 #endif

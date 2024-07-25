@@ -99,8 +99,12 @@ void ms_process_resize(t_minisweep *ms) {
       mn->x = sw / 2 - mn->win_w / 2;
       mn->y = sh / 2 - mn->win_h / 2;
       menu_update_size(mn, mn->win_w, mn->win_h);
-    } else
+    } else if (i != SCORE)
       menu_update_size(mn, sw, sh);
+    else {
+      menu_mov(ms->menus[SCORE], sw / 2 - ms->menus[SCORE]->win_w / 2,
+               sh - ms->menus[SCORE]->win_h * 1.5);
+    }
   }
 }
 

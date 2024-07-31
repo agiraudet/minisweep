@@ -125,6 +125,7 @@ void ms_process_mouseover(t_minisweep *ms) {
 }
 
 int ms_process_clicmenu(t_minisweep *ms, int clic_x, int clic_y) {
+  int ret = 0;
   for (int i = N_MENU - 1; i >= 0; i--) {
     t_menu *mn = ms->menus[i];
     if (!mn)
@@ -135,9 +136,10 @@ int ms_process_clicmenu(t_minisweep *ms, int clic_x, int clic_y) {
         mn->onclic(mn, ms, str);
         return 1;
       }
+      ret = 1;
     }
   }
-  return 0;
+  return ret;
 }
 
 char *ms_get_hsbuf(t_minisweep *ms) {
@@ -190,6 +192,15 @@ void ms_process_clicgrid(t_minisweep *ms, int clic_x, int clic_y) {
     process_endofgame(ms);
 }
 
+int ms_menu_opened(t_minisweep *ms) {
+  for (int i = N_MENU - 1; i >= 0; i--) {
+    t_menu *mn = ms->menus[i];
+    if (mn && mn->visible)
+      return 1;
+  }
+  return 0;
+}
+
 void ms_process_input(t_minisweep *ms) {
   if (!ms)
     return;
@@ -216,7 +227,7 @@ void ms_process_input(t_minisweep *ms) {
       menu_undrag(mn);
     }
   }
-  if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
+  if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT) && !ms_menu_opened(ms)) {
     int clic_x = GetMouseX();
     int clic_y = GetMouseY();
     if (ms->grid && ms->grid->game_status == 0)

@@ -4,13 +4,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define REVEALED 1
-#define HIDDEN 0
-#define FLAGGED -1
+typedef enum { FLAGGED = -1, HIDDEN = 0, REVEALED = 1 } e_cellstate;
 
 typedef struct cell {
   int8_t data;
-  int8_t status;
+  e_cellstate status;
 } t_cell;
 
 typedef struct grid {
